@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zdouble.infrastructure.persistent.dao.StrategyAwardDao">
+
+    <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.StrategyAward">
+        <id column="id" property="id"/>
+        <result column="strategyId" property="strategyId"/>
+        <result column="awardId" property="awardId"/>
+        <result column="awardTitle" property="awardTitle"/>
+        <result column="awardSubTitle" property="awardSubTitle"/>
+        <result column="awardCount" property="awardCount"/>
+        <result column="awardCountSurplus" property="awardCountSurplus"/>
+        <result column="awardRate" property="awardRate"/>
+        <result column="ruleModels" property="ruleModels"/>
+        <result column="sort" property="sort"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+    <select id="queryStrategyAwardList" resultMap="resultMap">
+        select *
+        from strategy_award
+        limit 10
+    </select>
+</mapper>
