@@ -43,6 +43,7 @@
             <groupId>com.zdouble</groupId>
             <artifactId>big-market-types</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>

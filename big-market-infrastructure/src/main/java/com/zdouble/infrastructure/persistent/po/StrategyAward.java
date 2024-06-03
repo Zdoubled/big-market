@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class StrategyAward {
     private Long id;
     private Long strategyId;
-    private Long awardId;
+    private Integer awardId;
     private String awardTitle;
     private String awardSubTitle;
     private Integer awardCount;
