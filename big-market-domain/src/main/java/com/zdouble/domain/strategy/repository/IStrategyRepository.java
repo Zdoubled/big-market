@@ -1,17 +1,24 @@
 package com.zdouble.domain.strategy.repository;
 
-import com.zdouble.domain.strategy.model.entity.StrategyAwardEntry;
+import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
+import com.zdouble.domain.strategy.model.entity.StrategyEntity;
+import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
 public interface IStrategyRepository {
-    List<StrategyAwardEntry> queryStrategyAwardList(Long strategyId);
+    List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId);
 
-    void setStrategyAwardSearchRateTable(Long strategyId, int rateRange, HashMap<Integer, Integer> shuffleStrategyAwardSearchRateTable);
+    void setStrategyAwardSearchRateTable(String key, int rateRange, HashMap<Integer, Integer> shuffleStrategyAwardSearchRateTable);
 
     int getRateRange(Long strategyId);
 
-    Integer getStrategyAwardAssemble(Long strategyId, int rateKey);
+    int getRateRange(String key);
+
+    Integer getStrategyAwardAssemble(String key, int rateKey);
+
+    StrategyEntity queryStrategyByStrategyId(Long strategyId);
+
+    StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleModel);
 }

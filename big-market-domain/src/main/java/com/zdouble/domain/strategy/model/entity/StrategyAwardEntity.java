@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StrategyAwardEntry {
+public class StrategyAwardEntity {
     private Long strategyId;
     private Integer awardId;
     private Integer awardCount;

@@ -6,7 +6,7 @@ import lombok.Data;
 public class StrategyRule {
     private Long id;
     private Long strategyId;
-    private Long awardId;
+    private Integer awardId;
     private Short ruleType;
     private String ruleModel;
     private String ruleValue;
