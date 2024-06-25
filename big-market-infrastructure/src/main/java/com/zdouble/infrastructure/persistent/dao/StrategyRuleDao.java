@@ -12,4 +12,6 @@ public interface StrategyRuleDao {
     public List<StrategyRule> queryStrategyRuleList();
 
     StrategyRule queryStrategyRule(StrategyRule strategyRule);
+
+    String queryStrategyRuleValue(StrategyRule strategyRule);
 }

@@ -23,4 +23,13 @@
         where strategy_id = #{strategyId}
         and rule_model = #{ruleModel}
     </select>
+    <select id="queryStrategyRuleValue" resultType="java.lang.String" parameterType="com.zdouble.infrastructure.persistent.po.StrategyRule">
+        select rule_value
+        from strategy_rule
+        <where>
+        <if test="strategyId != null">strategy_id = #{strategyId}</if>
+        <if test="awardId != null">and award_id = #{awardId}</if>
+        <if test="ruleModel != null">and rule_model = #{ruleModel}</if>
+        </where>
+    </select>
 </mapper>

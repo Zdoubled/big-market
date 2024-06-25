@@ -17,7 +17,7 @@ public class StrategyEntity {
 
     public String[] getModel(){
         if (StringUtils.isBlank(ruleModel)) {
-            return null;
+            return new String[0];
         }
         return ruleModel.split(",");
     }

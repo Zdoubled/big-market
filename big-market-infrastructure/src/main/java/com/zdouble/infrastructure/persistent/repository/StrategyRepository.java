@@ -3,6 +3,7 @@ package com.zdouble.infrastructure.persistent.repository;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
+import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
 import com.zdouble.infrastructure.persistent.dao.StrategyAwardDao;
 import com.zdouble.infrastructure.persistent.dao.StrategyDao;
@@ -15,6 +16,7 @@ import com.zdouble.types.common.Constants;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,5 +114,27 @@ public class StrategyRepository implements IStrategyRepository {
                 .ruleType(strategyRule.getRuleType())
                 .awardId(strategyRule.getAwardId())
                 .build();
+    }
+
+    @Override
+    public String queryStrategyRuleValue(Long strategyId, Integer awardId,String ruleModel) {
+        StrategyRule strategyRule = new StrategyRule();
+        strategyRule.setStrategyId(strategyId);
+        strategyRule.setAwardId(awardId);
+        strategyRule.setRuleModel(ruleModel);
+        return strategyRuleDao.queryStrategyRuleValue(strategyRule);
+    }
+
+    @Override
+    public String queryStrategyRuleValue(Long strategyId, String ruleModel) {
+        return queryStrategyRuleValue(strategyId, null,ruleModel);
+    }
+
+    @Override
+    public StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId) {
+        StrategyRule strategyRule = new StrategyRule();
+        strategyRule.setStrategyId(strategyId);
+        strategyRule.setAwardId(awardId);
+        return StrategyAwardRuleModelVO.builder().ruleModels(strategyAwardDao.queryStrategyAwardRuleModel(strategyRule)).build();
     }
 }
