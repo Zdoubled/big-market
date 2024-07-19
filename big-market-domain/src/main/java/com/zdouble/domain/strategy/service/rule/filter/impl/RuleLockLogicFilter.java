@@ -44,8 +44,8 @@ public class RuleLockLogicFilter implements ILogicFilter<RaffleActionEntity.Raff
         Long ruleLockValue = Long.valueOf(ruleLockValueStr);
         if (userRaffleTimes >= ruleLockValue) {
             return RaffleActionEntity.<RaffleActionEntity.RaffleCenterAction>builder()
-                    .code(RuleLogicCheckTypeVO.TAKE_OVER.getCode())
-                    .info(RuleLogicCheckTypeVO.TAKE_OVER.getInfo())
+                    .code(RuleLogicCheckTypeVO.ALLOW.getCode())
+                    .info(RuleLogicCheckTypeVO.ALLOW.getInfo())
                     .data(RaffleActionEntity.RaffleCenterAction.builder()
                             .strategyId(strategyId)
                             .awardId(entity.getAwardId())
@@ -56,8 +56,8 @@ public class RuleLockLogicFilter implements ILogicFilter<RaffleActionEntity.Raff
                     .build();
         }
         return RaffleActionEntity.<RaffleActionEntity.RaffleCenterAction>builder()
-                .code(RuleLogicCheckTypeVO.ALLOW.getCode())
-                .info(RuleLogicCheckTypeVO.ALLOW.getInfo())
+                .code(RuleLogicCheckTypeVO.TAKE_OVER.getCode())
+                .info(RuleLogicCheckTypeVO.TAKE_OVER.getInfo())
                 .ruleModel(entity.getRuleModel())
                 .build();
     }

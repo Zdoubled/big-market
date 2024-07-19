@@ -9,11 +9,14 @@ import com.zdouble.domain.strategy.service.armory.IStrategyDispatch;
 import com.zdouble.domain.strategy.service.rule.chain.ILogicChain;
 import com.zdouble.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import com.zdouble.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
+import com.zdouble.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
 import com.zdouble.types.exception.AppException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import static com.zdouble.types.enums.ResponseCode.ILLEGAL_PARAMETER;
 
+@Slf4j
 public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
 
     protected IStrategyRepository strategyRepository;
@@ -22,10 +25,13 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
 
     protected DefaultLogicChainFactory defaultLogicChainFactory;
 
-    public AbstractRaffleStrategy(IStrategyRepository strategyRepository, IStrategyDispatch strategyDispatch, DefaultLogicChainFactory defaultLogicChainFactory) {
+    protected DefaultTreeFactory defaultTreeFactory;
+
+    public AbstractRaffleStrategy(IStrategyRepository strategyRepository, IStrategyDispatch strategyDispatch, DefaultLogicChainFactory defaultLogicChainFactory,DefaultTreeFactory defaultTreeFactory) {
         this.strategyRepository = strategyRepository;
         this.strategyDispatch = strategyDispatch;
         this.defaultLogicChainFactory = defaultLogicChainFactory;
+        this.defaultTreeFactory = defaultTreeFactory;
     }
 
     @Override
@@ -36,33 +42,23 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         if (null == strategyId || StringUtils.isBlank(userId)){
             throw new AppException(ILLEGAL_PARAMETER.getCode(), ILLEGAL_PARAMETER.getInfo());
         }
-        //1.获取策略
-        StrategyEntity strategyEntity = strategyRepository.queryStrategyByStrategyId(strategyId);
-        /**
-         * 前置规则过滤 配合责任链模式实现
-         */
-        ILogicChain logicChain = defaultLogicChainFactory.openLogicChain(strategyId);
-        Integer awardId = logicChain.logic(strategyId, userId);
-
-        /**
-         * 中置规则过滤
-         */
-        StrategyAwardRuleModelVO strategyAwardRuleModelVO = strategyRepository.queryStrategyAwardRuleModel(strategyId, awardId);
-        RaffleActionEntity<RaffleActionEntity.RaffleCenterAction> actionEntity = this.doCheckRaffleCenterLogic(RaffleFactorEntity.builder()
-                .strategyId(strategyId)
-                .userId(userId)
-                .awardId(awardId)
-                .build(), strategyAwardRuleModelVO.raffleCenterRuleModelList());
-        if (actionEntity.getCode().equals(RuleLogicCheckTypeVO.ALLOW.getCode())){
+        //前置规则过滤，责任链过滤
+        DefaultLogicChainFactory.StrategyAwardVO chainStrategyAwardVO = raffleLogicChain(strategyId, userId);
+        if(DefaultLogicChainFactory.LogicModel.RULE_DEFAULT.getCode().equals(chainStrategyAwardVO.getLogicModel())){
             return RaffleAwardEntity.builder()
-                    .awardDesc("奖品未解锁，走兜底策略")
+                    .awardId(chainStrategyAwardVO.getAwardId())
                     .build();
         }
+
+        //后置规则过滤，规则树过滤
+        DefaultTreeFactory.StrategyAwardVO treeStrategyAwardVO = raffleLogicTree(strategyId, userId, chainStrategyAwardVO.getAwardId());
+
+        log.info("抽奖结果:{}", treeStrategyAwardVO);
         return RaffleAwardEntity.builder()
-                .awardId(awardId)
+                .awardId(treeStrategyAwardVO.getAwardId())
+                .awardConfig(treeStrategyAwardVO.getAwardValue())
                 .build();
     }
-
-    protected abstract RaffleActionEntity<RaffleActionEntity.RaffleBeforeAction> doCheckRaffleBeforeLogic(RaffleFactorEntity raffleFactorEntity, String[] ruleModels);
-    protected abstract RaffleActionEntity<RaffleActionEntity.RaffleCenterAction> doCheckRaffleCenterLogic(RaffleFactorEntity raffleFactorEntity, String[] ruleModels);
+    protected abstract DefaultLogicChainFactory.StrategyAwardVO raffleLogicChain(Long strategyId, String userId);
+    protected abstract DefaultTreeFactory.StrategyAwardVO raffleLogicTree(Long strategyId, String userId, Integer awardId);
 }

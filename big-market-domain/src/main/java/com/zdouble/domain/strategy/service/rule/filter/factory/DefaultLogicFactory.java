@@ -26,7 +26,7 @@ public class DefaultLogicFactory {
     }
 
     public <T extends RaffleActionEntity.RaffleEntity> Map<String, ILogicFilter<T>> openLogicFilter(){
-        return (Map<String, ILogicFilter<T>>) (Map<?, ?>)logicFilterMap;
+        return (Map<String, ILogicFilter<T>>) (Map<?, ?>)logicFilterMap;//返回的过滤器类型是动态的
     }
 
     @Getter

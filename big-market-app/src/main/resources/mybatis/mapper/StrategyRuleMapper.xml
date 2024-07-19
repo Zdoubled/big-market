@@ -32,4 +32,10 @@
         <if test="ruleModel != null">and rule_model = #{ruleModel}</if>
         </where>
     </select>
+    <select id="queryStrategyAwardRule" resultMap="resultMap">
+        select rule_model ruleModels
+        from strategy_rule
+        where strategy_id = #{strategyId}
+        and award_id = #{awardId}
+    </select>
 </mapper>

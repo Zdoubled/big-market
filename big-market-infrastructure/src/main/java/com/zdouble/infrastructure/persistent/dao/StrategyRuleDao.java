@@ -1,6 +1,7 @@
 package com.zdouble.infrastructure.persistent.dao;
 
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
+import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import com.zdouble.infrastructure.persistent.po.Award;
 import com.zdouble.infrastructure.persistent.po.StrategyRule;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,4 +15,6 @@ public interface StrategyRuleDao {
     StrategyRule queryStrategyRule(StrategyRule strategyRule);
 
     String queryStrategyRuleValue(StrategyRule strategyRule);
+
+    StrategyAwardRuleModelVO queryStrategyAwardRule(Long strategyId, Integer awardId);
 }

@@ -4,6 +4,8 @@ import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
 import com.zdouble.domain.strategy.service.rule.chain.ILogicChain;
 import com.zdouble.domain.strategy.service.rule.chain.impl.DefaultLogicChain;
+import com.zdouble.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -34,5 +36,34 @@ public class DefaultLogicChainFactory {
         }
         current.appendNext(logicChainGroup.get("default"));
         return head;
+    }
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StrategyAwardVO {
+        private Integer awardId;
+        private String logicModel;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum LogicModel {
+
+        RULE_WIGHT("rule_weight","【抽奖前规则】根据抽奖权重返回可抽奖范围KEY","before"),
+        RULE_BLACKLIST("rule_blacklist","【抽奖前规则】黑名单规则过滤，命中黑名单则直接返回","before"),
+
+        RULE_LOCK("rule_lock", "【抽奖中规则】抽奖锁定规则，超过一定次数解锁奖品","center"),
+        RULE_LUCK_AWARD("rule_luck_award", "【抽奖后规则】,保底奖品","after"),
+        RULE_DEFAULT("default", "【抽奖后规则】保底奖品","after");
+
+        private final String code;
+        private final String info;
+        private final String type;
+
+        public static Boolean isCenter(String ruleModelCode){
+            return "center".equals(DefaultLogicFactory.LogicModel.valueOf(ruleModelCode.toUpperCase()).getType());
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.zdouble.domain.strategy.repository;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
+import com.zdouble.domain.strategy.model.vo.RuleTreeVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 
 import java.util.HashMap;
@@ -28,4 +29,8 @@ public interface IStrategyRepository {
     String queryStrategyRuleValue(Long strategyId, String ruleModel);
 
     StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId);
+
+    RuleTreeVO queryRuleTreeByTreeId(String treeId);
+
+    StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer awardId);
 }

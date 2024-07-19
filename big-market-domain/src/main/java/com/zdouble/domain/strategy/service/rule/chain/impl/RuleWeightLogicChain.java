@@ -3,6 +3,7 @@ package com.zdouble.domain.strategy.service.rule.chain.impl;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
 import com.zdouble.domain.strategy.service.armory.IStrategyDispatch;
 import com.zdouble.domain.strategy.service.rule.chain.AbstractLogicChain;
+import com.zdouble.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
 
     private final Long userScore = 0L;
     @Override
-    public Integer logic(Long strategyId, String userId) {
+    public DefaultLogicChainFactory.StrategyAwardVO logic(Long strategyId, String userId) {
         log.info("责任链过滤，策略ID：{}，用户ID：{}，规则模型：{}", strategyId, userId, ruleModel());
         String ruleValue = strategyRepository.queryStrategyRuleValue(strategyId, ruleModel());
         Map<Long, String> ruleMap = analyzeRuleValue(ruleValue);
@@ -35,7 +36,10 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
                 .orElse(null);
 
         if (null != ruleScore) {
-            return strategyDispatch.getRandomAwardId(strategyId, ruleMap.get(ruleScore));
+            return DefaultLogicChainFactory.StrategyAwardVO.builder()
+                    .awardId(strategyDispatch.getRandomAwardId(strategyId, ruleMap.get(ruleScore)))
+                    .logicModel(ruleModel())
+                    .build();
         }
 
         return next().logic(strategyId, userId);
