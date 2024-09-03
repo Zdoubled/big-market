@@ -148,14 +148,6 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public StrategyAwardRuleModelVO queryStrategyAwardRuleModel(Long strategyId, Integer awardId) {
-        StrategyAward strategyAward = new StrategyAward();
-        strategyAward.setStrategyId(strategyId);
-        strategyAward.setAwardId(awardId);
-        return StrategyAwardRuleModelVO.builder().ruleModels(strategyAwardDao.queryStrategyAwardRuleModel(strategyAward)).build();
-    }
-
-    @Override
     public RuleTreeVO queryRuleTreeByTreeId(String treeId) {
         //1.查询redis缓存
         String cacheKey = Constants.RedisKey.RULE_TREE_KEY + Constants.UNDERLINE + treeId;
@@ -215,7 +207,7 @@ public class StrategyRepository implements IStrategyRepository {
         StrategyAward strategyAward = new StrategyAward();
         strategyAward.setStrategyId(strategyId);
         strategyAward.setAwardId(awardId);
-        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModel(strategyAward);
+        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModels(strategyAward);
         return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
     }
 
@@ -245,7 +237,7 @@ public class StrategyRepository implements IStrategyRepository {
         String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_QUEUE_KEY;
         RBlockingQueue<StrategyAwardKeyStockVO> blockingQueue = redisService.getBlockingQueue(cacheKey);
         RDelayedQueue<StrategyAwardKeyStockVO> delayedQueue = redisService.getDelayedQueue(blockingQueue);
-        delayedQueue.offer(strategyAwardKeyStockVO, 0, TimeUnit.SECONDS);
+        delayedQueue.offer(strategyAwardKeyStockVO, 3, TimeUnit.SECONDS);
     }
 
     @Override
