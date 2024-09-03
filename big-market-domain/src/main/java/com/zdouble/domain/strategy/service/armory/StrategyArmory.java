@@ -4,6 +4,7 @@ import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
+import com.zdouble.types.common.Constants;
 import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,14 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
     public Boolean assembleLotteryStrategy(Long strategyId) {
         //1.获取完整策略配置
         List<StrategyAwardEntity> strategyAwardList = strategyRepository.queryStrategyAwardList(strategyId);
+        //2.缓存奖品库存
+        for (StrategyAwardEntity strategyAward : strategyAwardList) {
+            Integer awardId = strategyAward.getAwardId();
+            Integer awardCount = strategyAward.getAwardCount();
+            cacheStrategyAwardCount(strategyId,awardId,awardCount);
+        }
         assembleLotteryStrategy(String.valueOf(strategyId), strategyAwardList);
-        //2.获取策略权重配置
+        //3.默认全量装配配置
         StrategyEntity strategyEntity = strategyRepository.queryStrategyByStrategyId(strategyId);
         String ruleWeight = strategyEntity.getRuleWeight();
         if (null == ruleWeight) {
@@ -37,15 +44,20 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
         if (null == strategyRuleEntity) {
             throw new AppException(STRATEGY_RULE_WEIGHT_IS_NULL.getCode(), STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
         }
-        //3.解析策略权重规则
+        //4.解析策略权重规则
         Map<String, List<Integer>> ruleWeightValues = strategyRuleEntity.getRuleWeightValues();
-        //4.装配
+        //5.装配
         ruleWeightValues.forEach((key, value) -> {
             ArrayList<StrategyAwardEntity> strategyAwardListClone = new ArrayList<>(strategyAwardList);
             strategyAwardListClone.removeIf(strategyAwardEntity -> !value.contains(strategyAwardEntity.getAwardId()));
             assembleLotteryStrategy(String.valueOf(strategyId).concat("_").concat(key), strategyAwardListClone);
         });
         return true;
+    }
+
+    private void cacheStrategyAwardCount(Long strategyId, Integer awardId, Integer awardCount) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        strategyRepository.cacheStrategyAwardCount(cacheKey,awardCount);
     }
 
     public void assembleLotteryStrategy(String key, List<StrategyAwardEntity> strategyAwardList) {
@@ -94,6 +106,12 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
         String key = String.valueOf(strategyId).concat("_").concat(ruleWeightValue);
         int rateRange = strategyRepository.getRateRange(key);
         return strategyRepository.getStrategyAwardAssemble(key,new SecureRandom().nextInt(rateRange));
+    }
+
+    @Override
+    public Boolean subtractAwardCount(Long strategyId, Integer awardId) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        return strategyRepository.subtractAwardCount(cacheKey);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.zdouble.infrastructure.persistent.dao;
 
+import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import com.zdouble.infrastructure.persistent.po.Award;
 import com.zdouble.infrastructure.persistent.po.StrategyAward;
@@ -10,9 +11,13 @@ import java.util.List;
 
 @Mapper
 public interface StrategyAwardDao {
-    public List<StrategyAward> queryStrategyAwardList();
+    List<StrategyAward> queryStrategyAwardList();
 
     List<StrategyAward> queryStrategyAwardListByStrategyId(Long strategyId);
 
-    String queryStrategyAwardRuleModel(StrategyRule strategyRule);
+    void updateStrategyAwardStock(StrategyAward strategyAward);
+
+    String queryStrategyAwardRuleModel(StrategyAward strategyAward);
+
+    StrategyAward queryStrategyAward(StrategyAward strategyAward);
 }

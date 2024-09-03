@@ -4,6 +4,7 @@ import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
 import com.zdouble.domain.strategy.model.vo.RuleTreeVO;
+import com.zdouble.domain.strategy.model.vo.StrategyAwardKeyStockVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 
 import java.util.HashMap;
@@ -33,4 +34,16 @@ public interface IStrategyRepository {
     RuleTreeVO queryRuleTreeByTreeId(String treeId);
 
     StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer awardId);
+
+    void cacheStrategyAwardCount(String cacheKey, Integer awardCount);
+
+    Boolean subtractAwardCount(String cacheKey);
+
+    void awardStockConsumeSendQueue(StrategyAwardKeyStockVO strategyAwardKeyStockVO);
+
+    StrategyAwardKeyStockVO takeQueueValue();
+
+    void updateStrategyAwardStock(Long strategyId, Integer awardId);
+
+    StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId);
 }

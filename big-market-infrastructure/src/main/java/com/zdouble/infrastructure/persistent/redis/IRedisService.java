@@ -231,4 +231,10 @@ public interface IRedisService {
     <T> RBloomFilter<T> getBloomFilter(String key);
 
     <K, V> RMap<K, V> getMap(String key);
+
+    Long getAtomicLong(String key);
+
+    void setAtomicLong(String key, Integer value);
+
+    Boolean setNx(String key);
 }

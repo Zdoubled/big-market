@@ -1,4 +1,4 @@
-package com.zdouble.domain.strategy.model.entity;
+package com.zdouble.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RaffleAwardEntity {
-    // 奖品id
+public class StrategyRaffleResponseDto {
     private Integer awardId;
-    // 奖品配置信息
-    private String awardConfig;
-    // 奖品排序顺序号
     private Integer sort;
 }

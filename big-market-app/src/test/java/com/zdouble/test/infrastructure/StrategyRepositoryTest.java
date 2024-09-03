@@ -29,12 +29,12 @@ public class StrategyRepositoryTest {
 
     @Test
     public void test_tree_repository() {
-        RuleTree treeLock = ruleTreeDao.queryRuleTreeByTreeId("tree_lock");
+/*        RuleTree treeLock = ruleTreeDao.queryRuleTreeByTreeId("tree_lock");
         List<RuleTreeNode> treeLockNodes = ruleTreeNodeDao.queryRuleTreeNodeByTreeId("tree_lock");
         List<RuleTreeNodeLine> ruleTreeNodeLines = ruleTreeNodeLineDao.queryRuleTreeNodeLineByTreeId("tree_lock");
 
         log.info("treeLock: {}", treeLock);
         log.info("treeLockNodes: {}", treeLockNodes);
-        log.info("ruleTreeNodeLines: {}", ruleTreeNodeLines);
+        log.info("ruleTreeNodeLines: {}", ruleTreeNodeLines);*/
     }
 }

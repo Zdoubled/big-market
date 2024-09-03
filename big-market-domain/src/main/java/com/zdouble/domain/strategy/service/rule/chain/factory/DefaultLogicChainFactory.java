@@ -3,8 +3,6 @@ package com.zdouble.domain.strategy.service.rule.chain.factory;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
 import com.zdouble.domain.strategy.service.rule.chain.ILogicChain;
-import com.zdouble.domain.strategy.service.rule.chain.impl.DefaultLogicChain;
-import com.zdouble.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -61,9 +59,5 @@ public class DefaultLogicChainFactory {
         private final String code;
         private final String info;
         private final String type;
-
-        public static Boolean isCenter(String ruleModelCode){
-            return "center".equals(DefaultLogicFactory.LogicModel.valueOf(ruleModelCode.toUpperCase()).getType());
-        }
     }
 }

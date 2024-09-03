@@ -6,9 +6,7 @@ import com.zdouble.domain.strategy.model.entity.RaffleFactorEntity;
 import com.zdouble.domain.strategy.service.IRaffleStrategy;
 import com.zdouble.domain.strategy.service.rule.chain.ILogicChain;
 import com.zdouble.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
-import com.zdouble.domain.strategy.service.rule.chain.impl.DefaultLogicChain;
 import com.zdouble.domain.strategy.service.rule.chain.impl.RuleWeightLogicChain;
-import com.zdouble.domain.strategy.service.rule.filter.impl.RuleLockLogicFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +27,6 @@ public class LogicChainTest {
     private RuleWeightLogicChain ruleWeightLogicChain;
     @Resource
     private IRaffleStrategy raffleStrategy;
-    @Resource
-    private RuleLockLogicFilter ruleLockLogicFilter;
 
     @Before
     public void setUp() {
@@ -59,15 +55,4 @@ public class LogicChainTest {
         log.info("测试结果awardId:{}",strategyAwardVO);
     }
 
-    @Test
-    public void test_performRaffle() {
-        ReflectionTestUtils.setField(ruleLockLogicFilter, "userRaffleTimes", 10L);
-        RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder()
-                .userId("xiaofuge")
-                .strategyId(100003L)
-                .build();
-        RaffleAwardEntity raffleAwardEntity = raffleStrategy.performRaffle(raffleFactorEntity);
-        log.info("请求参数：{}", JSON.toJSONString(raffleFactorEntity));
-        log.info("测试结果：{}", JSON.toJSONString(raffleAwardEntity));
-    }
 }

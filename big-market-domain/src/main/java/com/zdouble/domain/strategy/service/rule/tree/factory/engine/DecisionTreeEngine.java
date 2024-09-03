@@ -31,7 +31,7 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
         while (nextNode != null){
             RuleTreeNodeVO ruleTreeNodeVO = treeNodeMap.get(nextNode);//获取规则树节点
             ILogicTreeNode logicTreeNode = logicTreeNodeGroup.get(ruleTreeNodeVO.getRuleKey());//获取节点执行器
-            DefaultTreeFactory.TreeActionEntity treeActionEntity = logicTreeNode.logic(strategyId, userId, awardId);//执行规则过滤
+            DefaultTreeFactory.TreeActionEntity treeActionEntity = logicTreeNode.logic(strategyId, userId, awardId, ruleTreeNodeVO.getRuleValue());//执行规则过滤
             strategyAwardVO = treeActionEntity.getStrategyAwardVO();
             nextNode = getNextNode(treeActionEntity.getRuleLogicCheckTypeVO(), ruleTreeNodeVO.getTreeNodeLinkList());
 
@@ -44,6 +44,7 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
         if (treeNodeLinkList == null || treeNodeLinkList.isEmpty()) {
             return null;
         }
+        if (ruleLogicCheckTypeVO.equals(RuleLogicCheckTypeVO.TAKE_OVER)) return null;
         for (RuleTreeNodeLineVO ruleTreeNodeLineVO : treeNodeLinkList) {
             if (decision(ruleLogicCheckTypeVO.getCode(), ruleTreeNodeLineVO)) {
                 return ruleTreeNodeLineVO.getTreeNodeIdTo();

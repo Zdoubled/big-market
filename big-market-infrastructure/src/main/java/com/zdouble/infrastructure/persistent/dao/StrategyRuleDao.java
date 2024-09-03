@@ -15,6 +15,4 @@ public interface StrategyRuleDao {
     StrategyRule queryStrategyRule(StrategyRule strategyRule);
 
     String queryStrategyRuleValue(StrategyRule strategyRule);
-
-    StrategyAwardRuleModelVO queryStrategyAwardRule(Long strategyId, Integer awardId);
 }

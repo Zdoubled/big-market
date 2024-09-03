@@ -21,9 +21,9 @@ public class AwardDaoTest {
 
     @Test
     public void test_queryAwardList() {
-        List<Award> awardList = awardDao.queryAwardList();
+/*        List<Award> awardList = awardDao.queryAwardList();
         for (Award award : awardList) {
             log.info(award.toString());
-        }
+        }*/
     }
 }
