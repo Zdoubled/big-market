@@ -33,7 +33,7 @@
         from strategy_award
         where strategy_id = #{strategyId}
     </select>
-    <select id="queryStrategyAwardRuleModel" parameterType="com.zdouble.infrastructure.persistent.po.StrategyAward" resultMap="resultMap">
+    <select id="queryStrategyAwardRuleModels" parameterType="com.zdouble.infrastructure.persistent.po.StrategyAward" resultType="java.lang.String">
         select rule_models
         from strategy_award
         where strategy_id = #{strategyId}

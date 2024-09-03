@@ -21,6 +21,11 @@ public class DefaultTreeFactory {
         this.logicTreeNodeGroup = logicTreeNodeGroup;
     }
 
+    /**
+     * 将规则树 ruleTreeVO 交给规则引擎,执行规则过滤
+     * @param ruleTreeVO
+     * @return
+     */
     public IDecisionTreeEngine openTreeEngine(RuleTreeVO ruleTreeVO) {
         return new DecisionTreeEngine(ruleTreeVO, logicTreeNodeGroup);
     }

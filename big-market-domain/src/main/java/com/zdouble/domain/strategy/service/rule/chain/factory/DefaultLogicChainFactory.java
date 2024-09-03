@@ -20,6 +20,11 @@ public class DefaultLogicChainFactory {
         this.strategyRepository = strategyRepository;
     }
 
+    /**
+     * 装配责任链
+     * @param strategyId
+     * @return
+     */
     public ILogicChain openLogicChain(Long strategyId) {
         StrategyEntity strategyEntity = strategyRepository.queryStrategyByStrategyId(strategyId);
         String[] ruleModels = strategyEntity.getModel();
