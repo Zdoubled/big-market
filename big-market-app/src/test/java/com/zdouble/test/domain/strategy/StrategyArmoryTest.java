@@ -1,4 +1,4 @@
-package com.zdouble.test.domain;
+package com.zdouble.test.domain.strategy;
 
 import com.zdouble.domain.strategy.service.armory.IStrategyArmory;
 import com.zdouble.domain.strategy.service.armory.IStrategyDispatch;

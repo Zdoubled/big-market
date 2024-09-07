@@ -1,4 +1,4 @@
-package com.zdouble.test.domain;
+package com.zdouble.test.domain.strategy;
 
 import com.alibaba.fastjson.JSON;
 import com.zdouble.domain.strategy.model.entity.RaffleAwardEntity;
@@ -30,7 +30,7 @@ public class RaffleStrategyTest {
     @Before
     public void setUp() {
         // 策略装配 100001、100002、100003
-        log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100001L));
+        log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100006L));
         //log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100006L));
         // 通过反射 mock 规则中的值
         ReflectionTestUtils.setField(ruleWeightLogicChain, "userScore", 4900L);
