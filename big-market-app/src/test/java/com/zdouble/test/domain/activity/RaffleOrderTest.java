@@ -20,13 +20,12 @@ public class RaffleOrderTest {
 
     @Test
     public void test() {
-        ActivitySkuChargeEntity shopCardEntity = ActivitySkuChargeEntity.builder()
-                .sku(9011L)
-                .userId("doublez")
-                .build();
-        ActivityOrderEntity raffleActivityOrder = raffleOrder.createRaffleActivityOrder(shopCardEntity);
-
-        log.info("raffleActivityOrder:{}", raffleActivityOrder.toString());
+        ActivitySkuChargeEntity activitySkuChargeEntity = new ActivitySkuChargeEntity();
+        activitySkuChargeEntity.setSku(9011L);
+        activitySkuChargeEntity.setUserId("xiaofuge");
+        activitySkuChargeEntity.setOutBusinessNo("700091009112");
+        String orderId = raffleOrder.createSkuRechargeOrder(activitySkuChargeEntity);
+        log.info("订单id:{}", orderId);
     }
 
 }

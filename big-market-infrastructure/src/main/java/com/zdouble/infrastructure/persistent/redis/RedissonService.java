@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis 服务 - Redisson
@@ -163,6 +164,11 @@ public class RedissonService implements IRedisService {
     @Override
     public Boolean setNx(String key) {
         return redissonClient.getBucket(key).trySet("lock");
+    }
+
+    @Override
+    public Boolean setNx(String key, Long expireTime, TimeUnit timeUnit) {
+        return redissonClient.getBucket(key).trySet("lock", expireTime, timeUnit);
     }
 
 }

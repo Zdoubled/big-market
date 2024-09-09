@@ -30,9 +30,9 @@ public abstract class AbstractRaffleActivity extends RaffleActivitySupport imple
         ActivitySkuEntity activitySkuEntity = queryActivitySku(sku);
         ActivityEntity activityEntity = queryActivityByActivityId(activitySkuEntity.getActivityId());
         ActivityCountEntity activityCountEntity = queryActivityCountByActivityCountId(activitySkuEntity.getActivityCountId());
-        // 3. 活动规则过滤处理（活动状态、活动时间等）todo 后续处理规则过滤流程，暂时也不处理责任链结果
+        // 3. 活动规则过滤处理（活动状态、活动时间等）
         IActionChain actionChain = defaultActionChainFactory.openChain();
-        boolean success = actionChain.action(activitySkuEntity, activityEntity, activityCountEntity);
+        actionChain.action(activitySkuEntity, activityEntity, activityCountEntity);
         // 4. 封装聚合对象  提取方法，交由子类实现抽象方法
         CreateOrderAggregate createOrderAggregate = buildOrderAggregate(activitySkuEntity, activityEntity, activityCountEntity, activitySkuChargeEntity);
         // 5. 保存到数据库  提取方法交由子类实现抽象方法

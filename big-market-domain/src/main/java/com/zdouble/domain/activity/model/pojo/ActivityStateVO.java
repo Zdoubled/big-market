@@ -7,10 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ActivityStateVO {
 
-    create("创建",""),
-    start("开始",""),
-    end("结束",""),
-    close("关闭","")
+    create("create",""),
+    start("online",""),
+    end("offline",""),
+    close("close","")
     ;
 
     private String code;

@@ -15,15 +15,16 @@
         <result column="day_count" property="dayCount"/>
         <result column="month_count" property="monthCount"/>
         <result column="state" property="state"/>
+        <result column="out_business_no" property="outBusinessNo"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
-    <insert id="insert" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityOrder" useGeneratedKeys="true" keyProperty="order_id">
-        insert into raffle_activity_order (user_id,sku,activity_id,activity_name,strategy_id,order_id,order_time,total_count,day_count,month_count,state,create_time,update_time)
-        values (#{userId},#{sku},#{activityId},#{activityName},#{strategyId},#{orderId},#{orderTime},#{totalCount},#{dayCount},#{monthCount},#{state},now(),now())
+    <insert id="insert" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityOrder">
+        insert into raffle_activity_order (user_id,sku,activity_id,activity_name,strategy_id,order_id,order_time,total_count,day_count,month_count,state,out_business_no,create_time,update_time)
+        values (#{userId},#{sku},#{activityId},#{activityName},#{strategyId},#{orderId},#{orderTime},#{totalCount},#{dayCount},#{monthCount},#{state},#{outBusinessNo},now(),now())
     </insert>
     <select id="queryRaffleActivityOrderByUserId" parameterType="java.lang.String" resultMap="resultMap" >
-        select user_id,sku,activity_id,activity_name,strategy_id,order_id,order_time,total_count,day_count,month_count,state
+        select user_id,sku,activity_id,activity_name,strategy_id,order_id,order_time,total_count,day_count,month_count,state,out_business_no
         from raffle_activity_order
         where user_id = #{userId}
     </select>

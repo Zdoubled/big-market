@@ -2,6 +2,7 @@ package com.zdouble.domain.activity.service;
 
 import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.zdouble.domain.activity.model.entity.*;
+import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 import com.zdouble.domain.activity.model.pojo.OrderStateVO;
 import com.zdouble.domain.activity.repository.IActivityRepository;
 import com.zdouble.domain.activity.service.rule.factory.DefaultActionChainFactory;
@@ -13,7 +14,7 @@ import java.util.Date;
 
 @Service
 @Slf4j
-public class RaffleActivityService extends AbstractRaffleActivity{
+public class RaffleActivityService extends AbstractRaffleActivity implements ISkuStock{
     public RaffleActivityService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
         super(activityRepository, defaultActionChainFactory);
     }
@@ -36,6 +37,8 @@ public class RaffleActivityService extends AbstractRaffleActivity{
                 .build();
 
         return CreateOrderAggregate.builder()
+                .userId(activitySkuChargeEntity.getUserId())
+                .activityId(activitySkuEntity.getActivityId())
                 .dayCount(activityCountEntity.getDayCount())
                 .dayCountSurplus(activityCountEntity.getDayCount())
                 .monthCount(activityCountEntity.getMonthCount())
@@ -52,4 +55,23 @@ public class RaffleActivityService extends AbstractRaffleActivity{
     }
 
 
+    @Override
+    public ActivitySkuStockVO takeQueueValue() throws InterruptedException {
+        return activityRepository.takeQueueValue();
+    }
+
+    @Override
+    public void updateSkuStock(Long sku, Long activityId) {
+        activityRepository.updateSkuStock(sku, activityId);
+    }
+
+    @Override
+    public void clearQueueValue() {
+        activityRepository.clearQueueValue();
+    }
+
+    @Override
+    public void updateSkuStockZero(Long sku) {
+        activityRepository.updateSkuStockZero(sku);
+    }
 }

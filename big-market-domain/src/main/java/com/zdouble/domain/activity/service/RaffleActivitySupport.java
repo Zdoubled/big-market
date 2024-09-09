@@ -26,6 +26,6 @@ public abstract class RaffleActivitySupport {
     }
 
     public ActivityCountEntity queryActivityCountByActivityCountId(Long activityCountId) {
-        return activityRepository.queryArticleCountByActivityCountId(activityCountId);
+        return activityRepository.queryActivityCountByActivityCountId(activityCountId);
     }
 }

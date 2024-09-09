@@ -5,7 +5,6 @@ import com.zdouble.infrastructure.persistent.po.RaffleActivityAccount;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-@DBRouterStrategy(splitTable = true)
 public interface RaffleActivityAccountDao {
     void insert(RaffleActivityAccount raffleActivityAccount);
 

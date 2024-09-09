@@ -26,7 +26,10 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
         <!-- 系统模块 -->
         <dependency>
             <groupId>com.zdouble</groupId>
@@ -39,6 +42,12 @@
         <dependency>
             <groupId>com.zdouble</groupId>
             <artifactId>big-market-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zdouble</groupId>
+            <artifactId>big-market-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.zdouble</groupId>

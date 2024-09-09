@@ -21,12 +21,12 @@
     </insert>
     <update id="update" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount">
         update raffle_activity_account
-        set total_count =total_count + #{totalCount},
-        total_count_surplus =total_count_surplus + #{totalCountSurplus},
-        day_count =day_count + #{dayCount},
-        day_count_surplus =day_count_surplus + #{dayCountSurplus},
-        month_count =month_count + #{monthCount},
-        month_count_surplus =month_count_surplus + #{monthCountSurplus},
+        set total_count = total_count + #{totalCount},
+        total_count_surplus = total_count_surplus + #{totalCountSurplus},
+        day_count = day_count + #{dayCount},
+        day_count_surplus = day_count_surplus + #{dayCountSurplus},
+        month_count = month_count + #{monthCount},
+        month_count_surplus = month_count_surplus + #{monthCountSurplus},
         update_time = now()
         where user_id = #{userId} and activity_id = #{activityId}
     </update>

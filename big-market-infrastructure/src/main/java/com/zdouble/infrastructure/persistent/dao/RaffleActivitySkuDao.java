@@ -10,4 +10,8 @@ public interface RaffleActivitySkuDao {
     RaffleActivitySku conditionQueryRaffleActivitySku(RaffleActivitySku raffleActivitySku);
 
     RaffleActivitySku queryActivitySku(Long sku);
+
+    void updateSkuStock(Long sku, Long activityId);
+
+    void updateSkuStockZero(Long sku);
 }

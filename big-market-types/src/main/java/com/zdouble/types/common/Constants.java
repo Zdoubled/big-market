@@ -29,5 +29,8 @@ public class Constants {
         public static final String ACTIVITY_KEY = "big_market_activity_key";
         public final static String ACTIVITY_SKU_KEY = "big_market_activity_sku_key";
         public static final String ACTIVITY_COUNT_KEY = "big_market_activity_count_key";
+        public final static String ACTIVITY_SKU_STOCK_KEY = "big_market_activity_sku_stock_key";
+        public static final String ACTIVITY_SKU_STOCK_LOCK_KEY = "big_market_activity_sku_stock_lock_key";
+        public static final String ACTIVITY_SKU_STOCK_QUEUE_KEY = "big_market_sku_stock_queue_key";
     }
 }
