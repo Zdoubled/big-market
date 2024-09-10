@@ -1,9 +1,8 @@
 package com.zdouble.domain.activity.repository;
 
 import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
-import com.zdouble.domain.activity.model.entity.ActivityCountEntity;
-import com.zdouble.domain.activity.model.entity.ActivityEntity;
-import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
+import com.zdouble.domain.activity.model.aggregate.CreatePartakeOrderAggregate;
+import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 
 import java.util.Date;
@@ -30,4 +29,14 @@ public interface IActivityRepository {
     void clearQueueValue();
 
     void updateSkuStockZero(Long sku);
+
+    UserRaffleOrderEntity queryUserRaffleOrder(Long activityId, String userId);
+
+    ActivityAccountEntity queryActivityAccount(String userId, Long activityId);
+
+    void saveCreatePartakeOrderAggregate(CreatePartakeOrderAggregate createPartakeOrderAggregate);
+
+    ActivityAccountMonthEntity queryActivityAccountMonth(String userId, Long activityId, String month);
+
+    ActivityAccountDayEntity queryActivityAccountDay(String userId, Long activityId, String day);
 }

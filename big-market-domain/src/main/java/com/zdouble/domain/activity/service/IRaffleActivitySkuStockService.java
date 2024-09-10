@@ -2,7 +2,7 @@ package com.zdouble.domain.activity.service;
 
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 
-public interface ISkuStock {
+public interface IRaffleActivitySkuStockService {
     /**
      * 获取队列值
      * @return

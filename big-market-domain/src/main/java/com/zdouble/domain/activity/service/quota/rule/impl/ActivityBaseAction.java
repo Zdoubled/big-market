@@ -1,10 +1,10 @@
-package com.zdouble.domain.activity.service.rule.impl;
+package com.zdouble.domain.activity.service.quota.rule.impl;
 
 import com.zdouble.domain.activity.model.entity.ActivityCountEntity;
 import com.zdouble.domain.activity.model.entity.ActivityEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
 import com.zdouble.domain.activity.model.pojo.ActivityStateVO;
-import com.zdouble.domain.activity.service.rule.AbstractActionChain;
+import com.zdouble.domain.activity.service.quota.rule.AbstractActionChain;
 import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;

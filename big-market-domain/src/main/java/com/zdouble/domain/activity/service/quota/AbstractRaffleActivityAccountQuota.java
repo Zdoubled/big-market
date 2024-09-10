@@ -1,19 +1,20 @@
-package com.zdouble.domain.activity.service;
+package com.zdouble.domain.activity.service.quota;
 
 import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.repository.IActivityRepository;
-import com.zdouble.domain.activity.service.rule.IActionChain;
-import com.zdouble.domain.activity.service.rule.factory.DefaultActionChainFactory;
+import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
+import com.zdouble.domain.activity.service.quota.rule.IActionChain;
+import com.zdouble.domain.activity.service.quota.rule.factory.DefaultActionChainFactory;
 import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
-public abstract class AbstractRaffleActivity extends RaffleActivitySupport implements IRaffleOrder {
+public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivitySupport implements IRaffleActivityAccountQuotaService {
 
-    public AbstractRaffleActivity(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
+    public AbstractRaffleActivityAccountQuota(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
         super(activityRepository, defaultActionChainFactory);
     }
 

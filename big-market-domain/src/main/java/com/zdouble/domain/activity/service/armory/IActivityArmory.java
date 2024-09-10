@@ -1,4 +1,4 @@
-package com.zdouble.domain.activity.service.rule.armory;
+package com.zdouble.domain.activity.service.armory;
 
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 

@@ -1,4 +1,4 @@
-package com.zdouble.domain.activity.service.rule;
+package com.zdouble.domain.activity.service.quota.rule;
 
 public interface IActionChainArmory {
     IActionChain next();

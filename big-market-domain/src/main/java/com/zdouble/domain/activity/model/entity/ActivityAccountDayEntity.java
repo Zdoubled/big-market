@@ -1,23 +1,18 @@
-package com.zdouble.infrastructure.persistent.po;
+package com.zdouble.domain.activity.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class RaffleActivityAccountDay {
-    private Integer id;
+@AllArgsConstructor
+public class ActivityAccountDayEntity {
     private String userId;
     private Long activityId;
     private String day;
     private Integer dayCount;
     private Integer dayCountSurplus;
-    private Date createTime;
-    private Date updateTime;
 }

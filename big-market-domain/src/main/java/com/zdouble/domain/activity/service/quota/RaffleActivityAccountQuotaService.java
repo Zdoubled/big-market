@@ -1,11 +1,12 @@
-package com.zdouble.domain.activity.service;
+package com.zdouble.domain.activity.service.quota;
 
 import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 import com.zdouble.domain.activity.model.pojo.OrderStateVO;
 import com.zdouble.domain.activity.repository.IActivityRepository;
-import com.zdouble.domain.activity.service.rule.factory.DefaultActionChainFactory;
+import com.zdouble.domain.activity.service.IRaffleActivitySkuStockService;
+import com.zdouble.domain.activity.service.quota.rule.factory.DefaultActionChainFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,8 @@ import java.util.Date;
 
 @Service
 @Slf4j
-public class RaffleActivityService extends AbstractRaffleActivity implements ISkuStock{
-    public RaffleActivityService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
+public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAccountQuota implements IRaffleActivitySkuStockService {
+    public RaffleActivityAccountQuotaService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
         super(activityRepository, defaultActionChainFactory);
     }
 

@@ -1,8 +1,7 @@
 package com.zdouble.test.domain.activity;
 
-import com.zdouble.domain.activity.model.entity.ActivityOrderEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
-import com.zdouble.domain.activity.service.IRaffleOrder;
+import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +15,7 @@ import javax.annotation.Resource;
 @Slf4j
 public class RaffleOrderTest {
     @Resource
-    private IRaffleOrder raffleOrder;
+    private IRaffleActivityAccountQuotaService raffleOrder;
 
     @Test
     public void test() {

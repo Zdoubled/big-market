@@ -1,7 +1,9 @@
-package com.zdouble.domain.activity.service.rule.armory;
+package com.zdouble.domain.activity.service.armory;
 
 import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
 import com.zdouble.domain.activity.repository.IActivityRepository;
+import com.zdouble.domain.activity.service.armory.IActivityArmory;
+import com.zdouble.domain.activity.service.armory.IActivityDispatch;
 import com.zdouble.types.common.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

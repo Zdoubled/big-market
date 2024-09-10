@@ -1,13 +1,12 @@
-package com.zdouble.domain.activity.service.rule.impl;
+package com.zdouble.domain.activity.service.quota.rule.impl;
 
 import com.zdouble.domain.activity.model.entity.ActivityCountEntity;
 import com.zdouble.domain.activity.model.entity.ActivityEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 import com.zdouble.domain.activity.repository.IActivityRepository;
-import com.zdouble.domain.activity.service.rule.AbstractActionChain;
-import com.zdouble.domain.activity.service.rule.armory.IActivityArmory;
-import com.zdouble.domain.activity.service.rule.armory.IActivityDispatch;
+import com.zdouble.domain.activity.service.quota.rule.AbstractActionChain;
+import com.zdouble.domain.activity.service.armory.IActivityDispatch;
 import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
 import org.springframework.stereotype.Component;

@@ -18,7 +18,13 @@ public enum ResponseCode {
 
     ACTIVITY_STATE_ERROR("ERR_BIZ_003", "活动状态异常"),
     ACTIVITY_DATE_ERROR("ERR_BIZ_004", "不在活动时间范围内"),
-    ACTIVITY_SKU_STOCK_ERROR("ERR_BIZ_005", "活动sku库存异常")
+    ACTIVITY_SKU_STOCK_ERROR("ERR_BIZ_005", "活动sku库存异常"),
+
+    ACCOUNT_QUOTA_ERROR("ERR_BIZ_006", "活动账户额度异常"),
+    ACCOUNT_MONTH_QUOTA_ERROR("ERR_BIZ_006", "活动月账户额度异常"),
+    ACCOUNT_DAY_QUOTA_ERROR("ERR_BIZ_006", "活动日账户额度异常"),
+
+    USER_ORDER_INSERT_ERROR("ERR_BIZ_007", "用户订单插入异常"),
     ;
 
     private String code;

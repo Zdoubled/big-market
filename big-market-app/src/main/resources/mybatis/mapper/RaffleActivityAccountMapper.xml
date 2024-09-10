@@ -30,5 +30,23 @@
         update_time = now()
         where user_id = #{userId} and activity_id = #{activityId}
     </update>
+    <update id="updateActivityAccountSubtractionQuota" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount">
+        update raffle_activity_account
+        set total_count_surplus = total_count_surplus - 1, update_time = now()
+        where user_id = #{userId} and activity_id = #{activityId}
+    </update>
+    <update id="updateActivityAccountMonthSurplusMirror" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount">
+        update raffle_activity_account
+        set month_count_surplus = month_count_surplus - 1, update_time = now()
+        where user_id = #{userId} and activity_id = #{activityId}
+    </update>
+    <update id="updateActivityAccountDaySurplusMirror" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount">
+        update raffle_activity_account
+        set day_count_surplus = day_count_surplus - 1, update_time = now()
+        where user_id = #{userId} and activity_id = #{activityId}
+    </update>
+    <select id="queryActivityAccount" resultMap="resultMap">
+        select * from raffle_activity_account where user_id = #{userId} and activity_id = #{activityId}
+    </select>
 
 </mapper>

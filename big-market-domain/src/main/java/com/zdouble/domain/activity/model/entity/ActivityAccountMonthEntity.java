@@ -1,23 +1,19 @@
-package com.zdouble.infrastructure.persistent.po;
+package com.zdouble.domain.activity.model.entity;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RaffleActivityAccountMonth {
-    private Integer id;
+@Builder
+public class ActivityAccountMonthEntity {
     private String userId;
     private Long activityId;
     private String month;
     private Integer monthCount;
     private Integer monthCountSurplus;
-    private Date createTime;
-    private Date updateTime;
 }

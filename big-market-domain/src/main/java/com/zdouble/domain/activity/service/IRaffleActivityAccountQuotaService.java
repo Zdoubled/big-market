@@ -2,7 +2,7 @@ package com.zdouble.domain.activity.service;
 
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
 
-public interface IRaffleOrder {
+public interface IRaffleActivityAccountQuotaService {
 
     /**
      * 创建sku字数充值订单

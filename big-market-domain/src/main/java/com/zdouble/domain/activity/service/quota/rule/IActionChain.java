@@ -1,4 +1,4 @@
-package com.zdouble.domain.activity.service.rule;
+package com.zdouble.domain.activity.service.quota.rule;
 
 import com.zdouble.domain.activity.model.entity.ActivityCountEntity;
 import com.zdouble.domain.activity.model.entity.ActivityEntity;

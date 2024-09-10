@@ -1,10 +1,10 @@
-package com.zdouble.domain.activity.service;
+package com.zdouble.domain.activity.service.quota;
 
 import com.zdouble.domain.activity.model.entity.ActivityCountEntity;
 import com.zdouble.domain.activity.model.entity.ActivityEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
 import com.zdouble.domain.activity.repository.IActivityRepository;
-import com.zdouble.domain.activity.service.rule.factory.DefaultActionChainFactory;
+import com.zdouble.domain.activity.service.quota.rule.factory.DefaultActionChainFactory;
 
 public abstract class RaffleActivitySupport {
 

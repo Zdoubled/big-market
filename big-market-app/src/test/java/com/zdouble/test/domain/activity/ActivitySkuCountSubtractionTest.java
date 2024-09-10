@@ -1,10 +1,8 @@
 package com.zdouble.test.domain.activity;
 
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
-import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
-import com.zdouble.domain.activity.service.IRaffleOrder;
-import com.zdouble.domain.activity.service.rule.armory.IActivityArmory;
-import com.zdouble.domain.activity.service.rule.factory.DefaultActionChainFactory;
+import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
+import com.zdouble.domain.activity.service.armory.IActivityArmory;
 import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -24,7 +22,7 @@ public class ActivitySkuCountSubtractionTest {
     @Resource
     private IActivityArmory activityArmory;
     @Resource
-    private IRaffleOrder raffleOrder;
+    private IRaffleActivityAccountQuotaService raffleOrder;
 
     @Before
     public void init() {

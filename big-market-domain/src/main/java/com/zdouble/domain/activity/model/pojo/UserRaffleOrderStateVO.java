@@ -5,10 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ActivityStateVO {
-
+public enum UserRaffleOrderStateVO {
     create("create",""),
-    open("open",""),
+    used("used",""),
     close("close","")
     ;
 
