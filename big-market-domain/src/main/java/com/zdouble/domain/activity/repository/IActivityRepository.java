@@ -6,6 +6,7 @@ import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 
 import java.util.Date;
+import java.util.List;
 
 public interface IActivityRepository {
     ActivitySkuEntity queryActivitySku(Long sku);
@@ -39,4 +40,8 @@ public interface IActivityRepository {
     ActivityAccountMonthEntity queryActivityAccountMonth(String userId, Long activityId, String month);
 
     ActivityAccountDayEntity queryActivityAccountDay(String userId, Long activityId, String day);
+
+    List<ActivitySkuEntity> queryActivitySkuByActivityId(Long activityId);
+
+    Long queryStrategyIdByActivityId(Long articleId);
 }

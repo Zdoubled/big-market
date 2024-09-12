@@ -25,7 +25,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -73,8 +75,6 @@ public class ActivityRepository implements IActivityRepository {
                 .sku(activitySku.getSku())
                 .stockCount(activitySku.getStockCount())
                 .stockCountSurplus(activitySku.getStockCountSurplus())
-                .createTime(activitySku.getCreateTime())
-                .updateTime(activitySku.getUpdateTime())
                 .build();
         // 3.存缓存
         redisService.setValue(cacheKey, activitySkuEntity);
@@ -412,8 +412,25 @@ public class ActivityRepository implements IActivityRepository {
                     .day(day)
                     .build();
         }
-
         return null;
     }
 
+    @Override
+    public List<ActivitySkuEntity> queryActivitySkuByActivityId(Long activityId) {
+        List<RaffleActivitySku> raffleActivitySkuList = raffleActivitySkuDao.queryActivitySkuByActivityId(activityId);
+        return raffleActivitySkuList.stream().map(raffleActivitySku -> {
+            return ActivitySkuEntity.builder()
+                    .activityId(raffleActivitySku.getActivityId())
+                    .activityCountId(raffleActivitySku.getActivityCountId())
+                    .sku(raffleActivitySku.getSku())
+                    .stockCount(raffleActivitySku.getStockCount())
+                    .stockCountSurplus(raffleActivitySku.getStockCountSurplus())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Long queryStrategyIdByActivityId(Long articleId) {
+        return raffleActivityDao.queryStrategyIdByActivityId(articleId);
+    }
 }

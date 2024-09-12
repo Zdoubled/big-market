@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 活动信息缓存预热
@@ -21,6 +22,17 @@ public class ActivityArmory implements IActivityArmory, IActivityDispatch {
     @Resource
     private IActivityRepository activityRepository;
 
+
+    @Override
+    public Boolean assembleActivitySkuByActivityId(Long activityId) {
+        List<ActivitySkuEntity> activitySkuEntities = activityRepository.queryActivitySkuByActivityId(activityId);
+        for (ActivitySkuEntity activitySkuEntity : activitySkuEntities) {
+            cacheActivitySkuCount(activitySkuEntity.getSku(), activitySkuEntity.getStockCount());
+            activityRepository.queryActivityCountByActivityCountId(activitySkuEntity.getActivityCountId());
+        }
+        activityRepository.queryActivityByActivityId(activityId);
+        return true;
+    }
 
     @Override
     public Boolean assembleActivitySku(Long sku) {

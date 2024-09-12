@@ -25,6 +25,7 @@ public enum ResponseCode {
     ACCOUNT_DAY_QUOTA_ERROR("ERR_BIZ_006", "活动日账户额度异常"),
 
     USER_ORDER_INSERT_ERROR("ERR_BIZ_007", "用户订单插入异常"),
+    USER_ORDER_USED_ERROR("ERR_BIZ_007", "订单已被使用"),
     ;
 
     private String code;

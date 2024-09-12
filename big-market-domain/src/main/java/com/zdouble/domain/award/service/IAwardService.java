@@ -13,5 +13,4 @@ public interface IAwardService {
      * @param userAwardRecordEntity
      */
     void saveUserAwardRecord(UserAwardRecordEntity userAwardRecordEntity);
-
 }

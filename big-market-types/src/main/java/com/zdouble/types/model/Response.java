@@ -30,4 +30,7 @@ public class Response<T> implements Serializable {
     public static <T> Response<T> fail(String info) {
         return Response.<T>builder().code("0001").info(info).data(null).build();
     }
+    public static <T> Response<T> fail(String info, T data) {
+        return Response.<T>builder().code("0001").info(info).data(data).build();
+    }
 }
