@@ -3,10 +3,32 @@
 <mapper namespace="com.zdouble.infrastructure.persistent.dao.TaskDao">
     <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.Task">
         <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
         <result column="topic" property="topic"/>
         <result column="message" property="message"/>
+        <result column="message_id" property="messageId"/>
         <result column="state" property="state"/>
-        <result column="create_time" property="create_time"/>
-        <result column="update_time" property="update_time"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <insert id="insertTask" parameterType="com.zdouble.infrastructure.persistent.po.Task">
+        insert into task (user_id, topic, message, message_id, state, create_time, update_time)
+        values (#{userId}, #{topic}, #{message}, #{messageId}, #{state}, now(), now())
+    </insert>
+    <update id="updateTaskState" parameterType="com.zdouble.infrastructure.persistent.po.Task">
+        update task set state = #{state} where message_id = #{messageId} and user_id = #{userId}
+    </update>
+    <update id="updateTaskStateCompleted" parameterType="com.zdouble.infrastructure.persistent.po.Task">
+        update task set state = 'completed', update_time = now()
+        where user_id = #{userId} and message_id = #{messageId}
+    </update>
+    <update id="updateTaskStateFail" parameterType="com.zdouble.infrastructure.persistent.po.Task">
+        update task set state = 'fail', update_time = now()
+        where user_id = #{userId} and message_id = #{messageId}
+    </update>
+    <select id="queryNoSendMessageTaskList" resultMap="resultMap">
+        select user_id, topic, message, message_id from task
+        where state = 'fail' or (state = 'create' and now() - update_time > 60)
+        limit 10
+    </select>
 </mapper>

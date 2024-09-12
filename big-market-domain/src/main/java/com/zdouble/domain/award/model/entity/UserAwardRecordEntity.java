@@ -1,5 +1,6 @@
-package com.zdouble.infrastructure.persistent.po;
+package com.zdouble.domain.award.model.entity;
 
+import com.zdouble.domain.award.model.vo.AwardStateVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,11 +9,10 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserAwardRecord {
-    private Integer id;
+@NoArgsConstructor
+@Builder
+public class UserAwardRecordEntity {
     private String userId;
     private Long activityId;
     private Long strategyId;
@@ -20,7 +20,5 @@ public class UserAwardRecord {
     private Integer awardId;
     private String awardTitle;
     private Date awardTime;
-    private String awardState;
-    private Date createTime;
-    private Date updateTime;
+    private AwardStateVO awardState;
 }
