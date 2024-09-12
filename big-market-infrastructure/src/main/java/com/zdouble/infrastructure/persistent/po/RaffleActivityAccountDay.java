@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -12,6 +13,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RaffleActivityAccountDay {
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     private Integer id;
     private String userId;
     private Long activityId;
@@ -20,4 +23,8 @@ public class RaffleActivityAccountDay {
     private Integer dayCountSurplus;
     private Date createTime;
     private Date updateTime;
+
+    public String currentDay() {
+        return sdf.format(new Date());
+    }
 }

@@ -1,7 +1,7 @@
 package com.zdouble.trigger.http;
 
 import com.alibaba.fastjson.JSON;
-import com.zdouble.IRaffleService;
+import com.zdouble.IRaffleStrategyService;
 import com.zdouble.domain.strategy.model.entity.RaffleAwardEntity;
 import com.zdouble.domain.strategy.model.entity.RaffleFactorEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController()
 @CrossOrigin("${app.config.cross-origin}")
-@RequestMapping("/api/${app.config.api-version}/raffle/")
-public class RaffleController implements IRaffleService {
+@RequestMapping("/api/${app.config.api-version}/raffle/strategy/")
+public class RaffleControllerStrategy implements IRaffleStrategyService {
     @Resource
     private IStrategyArmory strategyArmory;
     @Resource

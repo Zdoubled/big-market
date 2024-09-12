@@ -17,6 +17,4 @@ public class ActivitySkuEntity {
     private Long activityCountId;
     private Integer stockCount;
     private Integer stockCountSurplus;
-    private Date createTime;
-    private Date updateTime;
 }

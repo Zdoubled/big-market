@@ -8,7 +8,7 @@ import com.zdouble.types.model.Response;
 
 import java.util.List;
 
-public interface IRaffleService {
+public interface IRaffleStrategyService {
     // 加载抽奖策略装配缓存
     Response<Boolean> strategyArmory(Long strategyId);
     // 加载策略奖品缓存
