@@ -44,6 +44,7 @@ public class RaffleActivityPartakeService extends AbstractRaffleActivityPartake{
         // 1. 查看总账户额度
         ActivityAccountEntity activityAccountEntity = activityRepository.queryActivityAccount(userId, activityId);
         if (null == activityAccountEntity || activityAccountEntity.getTotalCountSurplus() <= 0) {
+            log.info("用户[{}]没有足够的额度，无法参与活动[{}]", userId, activityId);
             throw new AppException(ResponseCode.ACCOUNT_QUOTA_ERROR.getCode(), ResponseCode.ACCOUNT_QUOTA_ERROR.getInfo());
         }
         String month = simpleMonthDateFormat.format(currentDate);

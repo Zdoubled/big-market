@@ -254,16 +254,22 @@ public class ActivityRepository implements IActivityRepository {
 
     @Override
     public ActivityAccountEntity queryActivityAccount(String userId, Long activityId) {
-        RaffleActivityAccount raffleActivityAccount = raffleActivityAccountDao.queryActivityAccount(userId, activityId);
-        if (null == raffleActivityAccount) return null;
+        // 封装条件查询
+        RaffleActivityAccount raffleActivityAccountReq = new RaffleActivityAccount();
+        raffleActivityAccountReq.setUserId(userId);
+        raffleActivityAccountReq.setActivityId(activityId);
+        raffleActivityAccountReq = raffleActivityAccountDao.queryActivityAccount(raffleActivityAccountReq);
+
+        if (null == raffleActivityAccountReq) return null;
         return ActivityAccountEntity.builder()
-                .userId(raffleActivityAccount.getUserId())
-                .totalCount(raffleActivityAccount.getTotalCount())
-                .totalCountSurplus(raffleActivityAccount.getTotalCountSurplus())
-                .monthCount(raffleActivityAccount.getMonthCount())
-                .monthCountSurplus(raffleActivityAccount.getMonthCountSurplus())
-                .dayCount(raffleActivityAccount.getDayCount())
-                .dayCountSurplus(raffleActivityAccount.getDayCountSurplus())
+                .userId(raffleActivityAccountReq.getUserId())
+                .activityId(raffleActivityAccountReq.getActivityId())
+                .totalCount(raffleActivityAccountReq.getTotalCount())
+                .totalCountSurplus(raffleActivityAccountReq.getTotalCountSurplus())
+                .monthCount(raffleActivityAccountReq.getMonthCount())
+                .monthCountSurplus(raffleActivityAccountReq.getMonthCountSurplus())
+                .dayCount(raffleActivityAccountReq.getDayCount())
+                .dayCountSurplus(raffleActivityAccountReq.getDayCountSurplus())
                 .build();
         }
 
