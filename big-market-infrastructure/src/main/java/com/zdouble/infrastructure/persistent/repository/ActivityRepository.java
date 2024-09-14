@@ -19,6 +19,7 @@ import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
+import org.redisson.api.RLock;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -259,8 +260,25 @@ public class ActivityRepository implements IActivityRepository {
         raffleActivityAccountReq.setUserId(userId);
         raffleActivityAccountReq.setActivityId(activityId);
         raffleActivityAccountReq = raffleActivityAccountDao.queryActivityAccount(raffleActivityAccountReq);
-
         if (null == raffleActivityAccountReq) return null;
+        // 缓存用户总、月、日剩余额度
+        String cacheKey = Constants.RedisKey.ACTIVITY_ACCOUNT_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId;
+        String cacheMonthKey = Constants.RedisKey.ACTIVITY_ACCOUNT_MONTH_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId;
+        String cacheDayKey = Constants.RedisKey.ACTIVITY_ACCOUNT_DAY_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId;
+        String lockKey = Constants.RedisKey.ACTIVITY_ACCOUNT_SURPLUS_COUNT_LOCK + activityId + Constants.UNDERLINE + userId;
+        if (!redisService.isExists(cacheKey)) {
+            RLock lock = redisService.getLock(lockKey);
+            try {
+                lock.lock(2, TimeUnit.SECONDS);
+                if (!redisService.isExists(cacheKey)){
+                    redisService.setAtomicLong(cacheKey, raffleActivityAccountReq.getTotalCountSurplus());
+                    redisService.setAtomicLong(cacheMonthKey, raffleActivityAccountReq.getMonthCountSurplus());
+                    redisService.setAtomicLong(cacheDayKey, raffleActivityAccountReq.getDayCountSurplus());
+                }
+            }finally {
+                lock.unlock();
+            }
+        }
         return ActivityAccountEntity.builder()
                 .userId(raffleActivityAccountReq.getUserId())
                 .activityId(raffleActivityAccountReq.getActivityId())
@@ -281,6 +299,21 @@ public class ActivityRepository implements IActivityRepository {
             ActivityAccountEntity activityAccountEntity = createPartakeOrderAggregate.getActivityAccountEntity();
             ActivityAccountMonthEntity activityAccountMonthEntity = createPartakeOrderAggregate.getActivityAccountMonthEntity();
             ActivityAccountDayEntity activityAccountDayEntity = createPartakeOrderAggregate.getActivityAccountDayEntity();
+            // 先对redis中的剩余额度进行扣减
+            String lockKey = Constants.RedisKey.ACTIVITY_ACCOUNT_SURPLUS_COUNT_LOCK + activityId + Constants.UNDERLINE + userId;
+            RLock lock = redisService.getLock(lockKey);
+            try {
+                lock.lock(2, TimeUnit.SECONDS);
+                long countSurplus = redisService.decr(Constants.RedisKey.ACTIVITY_ACCOUNT_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId);
+                long monthCountSurplus = redisService.decr(Constants.RedisKey.ACTIVITY_ACCOUNT_MONTH_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId);
+                long dayCountSurplus = redisService.decr(Constants.RedisKey.ACTIVITY_ACCOUNT_DAY_SURPLUS_COUNT_KEY + activityId + Constants.UNDERLINE + userId);
+                if (countSurplus < 0 || monthCountSurplus < 0 || dayCountSurplus < 0){
+                    throw new AppException(ResponseCode.ACCOUNT_QUOTA_ERROR.getCode(), ResponseCode.ACCOUNT_QUOTA_ERROR.getInfo());
+                }
+            }finally {
+                lock.unlock();
+            }
+
             dbRouterStrategy.doRouter(userId);
             transactionTemplate.execute(status -> {
                 // 更新总账户的额度
@@ -368,6 +401,10 @@ public class ActivityRepository implements IActivityRepository {
                             .activityName(userRaffleOrderEntity.getActivityName())
                             .build()
                     );
+                }catch (AppException e){
+                    log.info("插入用户抽奖订单失败:{}", e.getMessage());
+                    status.setRollbackOnly();
+                    throw new AppException(ResponseCode.USER_ORDER_INSERT_ERROR.getCode(), ResponseCode.USER_ORDER_INSERT_ERROR.getInfo());
                 }catch (DuplicateKeyException e){
                     log.info("插入用户抽奖订单失败:{}", e.getMessage());
                     status.setRollbackOnly();
