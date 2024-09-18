@@ -98,8 +98,6 @@ public class ActivityRepository implements IActivityRepository {
                 .state(raffleActivity.getState())
                 .beginDateTime(raffleActivity.getBeginDateTime())
                 .endDateTime(raffleActivity.getEndDateTime())
-                .updateTime(raffleActivity.getUpdateTime())
-                .createTime(raffleActivity.getCreateTime())
                 .build();
         redisService.setValue(cacheKey, activityEntity);
         return activityEntity;
@@ -185,7 +183,7 @@ public class ActivityRepository implements IActivityRepository {
         long surplus = redisService.decr(cacheKey);
         if (surplus == 0){
             // 发送消息队列，通知清空异步待处理的订单（sku）
-            String topic = activitySkuStockZeroMessageEvent.topic();
+            String topic = activitySkuStockZeroMessageEvent.topic() + sku;
             BaseEvent.EventMessage<Long> eventMessage = activitySkuStockZeroMessageEvent.buildEventMessage(sku);
             eventPublisher.publish(topic, eventMessage);
         }else if (surplus < 0){
@@ -205,7 +203,7 @@ public class ActivityRepository implements IActivityRepository {
 
     @Override
     public void activitySkuConsumeSendQueue(ActivitySkuStockVO activitySkuStockVO) {
-        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY;
+        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY + activitySkuStockVO.getSku();
         RBlockingQueue<Object> blockingQueue = redisService.getBlockingQueue(cacheKey);
         RDelayedQueue<Object> delayedQueue = redisService.getDelayedQueue(blockingQueue);
 
@@ -213,8 +211,8 @@ public class ActivityRepository implements IActivityRepository {
     }
 
     @Override
-    public ActivitySkuStockVO takeQueueValue() {
-        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY;
+    public ActivitySkuStockVO takeQueueValue(Long sku) {
+        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY + sku;
         RBlockingQueue<Object> blockingQueue = redisService.getBlockingQueue(cacheKey);
 
         return (ActivitySkuStockVO)blockingQueue.poll();
@@ -226,8 +224,8 @@ public class ActivityRepository implements IActivityRepository {
     }
 
     @Override
-    public void clearQueueValue() {
-        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY;
+    public void clearQueueValue(Long sku) {
+        String cacheKey = Constants.RedisKey.ACTIVITY_SKU_STOCK_QUEUE_KEY + sku;
         RBlockingQueue<Object> blockingQueue = redisService.getBlockingQueue(cacheKey);
         redisService.getDelayedQueue(blockingQueue).clear();
         blockingQueue.clear();
@@ -475,5 +473,31 @@ public class ActivityRepository implements IActivityRepository {
     @Override
     public Long queryStrategyIdByActivityId(Long articleId) {
         return raffleActivityDao.queryStrategyIdByActivityId(articleId);
+    }
+
+    @Override
+    public Integer queryRaffleActivityPartakeCount(String userId, Long activityId) {
+        RaffleActivityAccountDay activityAccountDay = RaffleActivityAccountDay.builder()
+                .activityId(activityId)
+                .userId(userId)
+                .day(ActivityAccountDayEntity.getDay())
+                .build();
+        Integer raffleActivityPartakeCount = raffleActivityAccountDayDao.queryRaffleActivityPartakeCount(activityAccountDay);
+        if (null == raffleActivityPartakeCount) return 0;
+        return raffleActivityPartakeCount;
+    }
+
+    @Override
+    public List<ActivitySkuEntity> queryActivitySkuList() {
+        List<RaffleActivitySku> raffleActivitySkuList = raffleActivitySkuDao.queryActivitySkuList();
+        return raffleActivitySkuList.stream().map(raffleActivitySku -> {
+            return ActivitySkuEntity.builder()
+                    .sku(raffleActivitySku.getSku())
+                    .activityId(raffleActivitySku.getActivityId())
+                    .activityCountId(raffleActivitySku.getActivityCountId())
+                    .stockCount(raffleActivitySku.getStockCount())
+                    .stockCountSurplus(raffleActivitySku.getStockCountSurplus())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

@@ -19,6 +19,4 @@ public class ActivityEntity {
     private Date endDateTime;
     private Long strategyId;
     private String state;
-    private Date createTime;
-    private Date updateTime;
 }

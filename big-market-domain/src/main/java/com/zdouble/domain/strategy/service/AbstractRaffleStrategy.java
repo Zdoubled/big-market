@@ -1,15 +1,15 @@
 package com.zdouble.domain.strategy.service;
 
 import com.zdouble.domain.strategy.model.entity.*;
-import com.zdouble.domain.strategy.model.vo.StrategyAwardKeyStockVO;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
 import com.zdouble.domain.strategy.service.armory.IStrategyDispatch;
 import com.zdouble.domain.strategy.service.rule.chain.factory.DefaultLogicChainFactory;
 import com.zdouble.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
-import com.zdouble.types.common.Constants;
 import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Date;
 
 import static com.zdouble.types.enums.ResponseCode.ILLEGAL_PARAMETER;
 
@@ -47,7 +47,7 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         }
 
         //后置规则过滤，规则树过滤
-        DefaultTreeFactory.StrategyAwardVO treeStrategyAwardVO = raffleLogicTree(strategyId, userId, chainStrategyAwardVO.getAwardId());
+        DefaultTreeFactory.StrategyAwardVO treeStrategyAwardVO = raffleLogicTree(strategyId, userId, chainStrategyAwardVO.getAwardId(), raffleFactorEntity.getEndTime());
 
         log.info("抽奖结果:{}", treeStrategyAwardVO);
         return buildRaffleAwardEntity(strategyId, treeStrategyAwardVO.getAwardId(), treeStrategyAwardVO.getAwardValue());
@@ -65,4 +65,5 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
 
     protected abstract DefaultLogicChainFactory.StrategyAwardVO raffleLogicChain(Long strategyId, String userId);
     protected abstract DefaultTreeFactory.StrategyAwardVO raffleLogicTree(Long strategyId, String userId, Integer awardId);
+    protected abstract DefaultTreeFactory.StrategyAwardVO raffleLogicTree(Long strategyId, String userId, Integer awardId, Date endTime);
 }

@@ -8,6 +8,7 @@ import com.zdouble.types.common.Constants;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 @Component("rule_luck_award")
 public class RuleLuckAwardLogicTreeNode implements ILogicTreeNode {
@@ -15,7 +16,7 @@ public class RuleLuckAwardLogicTreeNode implements ILogicTreeNode {
     private IStrategyRepository strategyRepository;
 
     @Override
-    public DefaultTreeFactory.TreeActionEntity logic(Long strategyId, String userId, Integer awardId, String ruleValue) {
+    public DefaultTreeFactory.TreeActionEntity logic(Long strategyId, String userId, Integer awardId, String ruleValue, Date endTime) {
         String[] split = ruleValue.split(Constants.COLON);
         if (split.length == 0){
             throw new RuntimeException("规则树节点配置有误");

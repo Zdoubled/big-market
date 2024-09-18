@@ -23,11 +23,11 @@ public interface IActivityRepository {
 
     void activitySkuConsumeSendQueue(ActivitySkuStockVO activitySkuStockVO);
 
-    ActivitySkuStockVO takeQueueValue();
+    ActivitySkuStockVO takeQueueValue(Long sku);
 
     void updateSkuStock(Long sku, Long activityId);
 
-    void clearQueueValue();
+    void clearQueueValue(Long sku);
 
     void updateSkuStockZero(Long sku);
 
@@ -44,4 +44,8 @@ public interface IActivityRepository {
     List<ActivitySkuEntity> queryActivitySkuByActivityId(Long activityId);
 
     Long queryStrategyIdByActivityId(Long articleId);
+
+    Integer queryRaffleActivityPartakeCount(String userId, Long activityId);
+
+    List<ActivitySkuEntity> queryActivitySkuList();
 }

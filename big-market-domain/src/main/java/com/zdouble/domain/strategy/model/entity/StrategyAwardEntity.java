@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 @Builder
@@ -20,4 +23,5 @@ public class StrategyAwardEntity {
     private Integer awardCount;
     private Integer awardCountSurplus;
     private BigDecimal awardRate;
+    private String ruleModels;
 }

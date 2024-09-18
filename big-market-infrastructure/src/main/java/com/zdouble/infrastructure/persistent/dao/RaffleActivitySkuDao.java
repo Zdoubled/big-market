@@ -18,4 +18,6 @@ public interface RaffleActivitySkuDao {
     void updateSkuStockZero(Long sku);
 
     List<RaffleActivitySku> queryActivitySkuByActivityId(Long activityId);
+
+    List<RaffleActivitySku> queryActivitySkuList();
 }

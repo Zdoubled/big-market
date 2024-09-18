@@ -32,7 +32,7 @@ public class ActivitySkuCountZeroListener {
             // 3. 更新库存直接位0
             skuStock.updateSkuStockZero(sku);
             // 2. 清理延迟队列
-            skuStock.clearQueueValue();
+            skuStock.clearQueueValue(sku);
         }catch (Exception e){
             log.error("监听到消息异常：{}", message, e);
             throw e;

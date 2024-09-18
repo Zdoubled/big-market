@@ -8,6 +8,7 @@ import com.zdouble.domain.strategy.service.rule.tree.ILogicTreeNode;
 import com.zdouble.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
     }
 
     @Override
-    public DefaultTreeFactory.StrategyAwardVO process(Long strategyId, String userId, Integer awardId) {
+    public DefaultTreeFactory.StrategyAwardVO process(Long strategyId, String userId, Integer awardId, Date endTime) {
         DefaultTreeFactory.StrategyAwardVO strategyAwardVO = null;
 
         String nextNode = ruleTreeVO.getRuleTreeRootNode();
@@ -31,7 +32,7 @@ public class DecisionTreeEngine implements IDecisionTreeEngine {
         while (nextNode != null){
             RuleTreeNodeVO ruleTreeNodeVO = treeNodeMap.get(nextNode);//获取规则树节点
             ILogicTreeNode logicTreeNode = logicTreeNodeGroup.get(ruleTreeNodeVO.getRuleKey());//获取节点执行器
-            DefaultTreeFactory.TreeActionEntity treeActionEntity = logicTreeNode.logic(strategyId, userId, awardId, ruleTreeNodeVO.getRuleValue());//执行规则过滤
+            DefaultTreeFactory.TreeActionEntity treeActionEntity = logicTreeNode.logic(strategyId, userId, awardId, ruleTreeNodeVO.getRuleValue(), endTime);//执行规则过滤
             strategyAwardVO = treeActionEntity.getStrategyAwardVO();
             nextNode = getNextNode(treeActionEntity.getRuleLogicCheckTypeVO(), ruleTreeNodeVO.getTreeNodeLinkList());
 

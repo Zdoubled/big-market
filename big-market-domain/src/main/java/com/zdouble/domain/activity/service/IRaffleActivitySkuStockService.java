@@ -1,6 +1,9 @@
 package com.zdouble.domain.activity.service;
 
+import com.zdouble.domain.activity.model.entity.ActivitySkuEntity;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
+
+import java.util.List;
 
 public interface IRaffleActivitySkuStockService {
     /**
@@ -8,7 +11,7 @@ public interface IRaffleActivitySkuStockService {
      * @return
      * @throws InterruptedException
      */
-    ActivitySkuStockVO takeQueueValue() throws InterruptedException;
+    ActivitySkuStockVO takeQueueValue(Long sku) throws InterruptedException;
 
     /**
      * 更新sku库存信息
@@ -20,10 +23,15 @@ public interface IRaffleActivitySkuStockService {
     /**
      * 清空延迟队列消息
      */
-    void clearQueueValue();
+    void clearQueueValue(Long sku);
 
     /**
      * 库存置零
      */
     void updateSkuStockZero(Long sku);
+
+    /**
+     * 获取所有sku
+     */
+    List<ActivitySkuEntity> queryActivitySkuList();
 }

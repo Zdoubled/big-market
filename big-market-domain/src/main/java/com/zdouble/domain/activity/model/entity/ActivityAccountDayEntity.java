@@ -21,7 +21,7 @@ public class ActivityAccountDayEntity {
     private Integer dayCount;
     private Integer dayCountSurplus;
 
-    public String getDay() {
+    public static String getDay() {
         return sdf.format(new Date());
     }
 }

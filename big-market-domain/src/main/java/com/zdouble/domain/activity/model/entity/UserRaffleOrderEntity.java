@@ -20,4 +20,6 @@ public class UserRaffleOrderEntity {
     private String orderId;
     private Date orderTime;
     private UserRaffleOrderStateVO orderState;
+    // 活动结束时间
+    private Date endTime;
 }

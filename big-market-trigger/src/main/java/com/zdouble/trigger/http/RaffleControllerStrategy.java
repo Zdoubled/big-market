@@ -2,6 +2,9 @@ package com.zdouble.trigger.http;
 
 import com.alibaba.fastjson.JSON;
 import com.zdouble.IRaffleStrategyService;
+import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
+import com.zdouble.domain.activity.service.IRaffleActivityPartakeService;
+import com.zdouble.domain.strategy.IRaffleRule;
 import com.zdouble.domain.strategy.model.entity.RaffleAwardEntity;
 import com.zdouble.domain.strategy.model.entity.RaffleFactorEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
@@ -12,11 +15,14 @@ import com.zdouble.dto.StrategyAwardListRequestDto;
 import com.zdouble.dto.StrategyAwardListResponseDto;
 import com.zdouble.dto.StrategyRaffleRequestDto;
 import com.zdouble.dto.StrategyRaffleResponseDto;
+import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.model.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +37,10 @@ public class RaffleControllerStrategy implements IRaffleStrategyService {
     private IRaffleAward raffleAward;
     @Resource
     private IRaffleStrategy raffleStrategy;
+    @Resource
+    private IRaffleRule raffleRule;
+    @Resource
+    private IRaffleActivityAccountQuotaService raffleActivityAccountQuotaService;
 
     /**
      * 策略装配，将策略信息装配到缓存中
@@ -62,22 +72,45 @@ public class RaffleControllerStrategy implements IRaffleStrategyService {
     @Override
     public Response<List<StrategyAwardListResponseDto>> queryStrategyAwardList(@RequestBody StrategyAwardListRequestDto strategyAwardListRequestDto) {
         try {
-            if (null == strategyAwardListRequestDto || null == strategyAwardListRequestDto.getStrategyId()) {
-                return Response.fail();
+            if (null == strategyAwardListRequestDto || null == strategyAwardListRequestDto.getActivityId()) {
+                log.info("查询奖品列表失败, 参数不合法。UserId : {}; ActivityId : {} ", strategyAwardListRequestDto.getUserId(), strategyAwardListRequestDto.getActivityId());
+                return Response.<List<StrategyAwardListResponseDto>>builder()
+                        .code(ResponseCode.ILLEGAL_PARAMETER.getCode())
+                        .info(ResponseCode.ILLEGAL_PARAMETER.getInfo())
+                        .build();
             }
-            List<StrategyAwardEntity> strategyAwardEntities = raffleAward.queryRaffleStrategyAwardList(strategyAwardListRequestDto.getStrategyId());
+            List<StrategyAwardEntity> strategyAwardEntities = raffleAward.queryRaffleStrategyAwardList(strategyAwardListRequestDto.getActivityId());
+            // 查询策略ruleModels
+            String[] treeIds = strategyAwardEntities.stream()
+                    .map(StrategyAwardEntity::getRuleModels)
+                    .filter(StringUtils::isNotBlank)
+                    .toArray(String[]::new);
+            HashMap<String, Integer> resultMap = raffleRule.queryRuleLockCount(treeIds);
+            Integer raffleActivityPartakeCount = raffleActivityAccountQuotaService.queryRaffleActivityPartakeCount(strategyAwardListRequestDto.getUserId(), strategyAwardListRequestDto.getActivityId());
+
             List<StrategyAwardListResponseDto> result = strategyAwardEntities.stream().map(strategyAwardEntity -> {
+                Integer ruleLockCount = resultMap.get(strategyAwardEntity.getRuleModels());
                 return StrategyAwardListResponseDto.builder()
                         .awardId(strategyAwardEntity.getAwardId())
                         .awardTitle(strategyAwardEntity.getAwardTitle())
                         .awardSubTitle(strategyAwardEntity.getAwardSubTitle())
                         .sort(strategyAwardEntity.getSort())
+                        .awardRuleLockCount(ruleLockCount)
+                        .isAwardUnLock(ruleLockCount == null || raffleActivityPartakeCount > ruleLockCount)
+                        .waitUnLockCount(ruleLockCount == null || ruleLockCount <= raffleActivityPartakeCount ? 0 : ruleLockCount - raffleActivityPartakeCount)
                         .build();
             }).collect(Collectors.toList());
-            return Response.success(result);
+
+            return Response.<List<StrategyAwardListResponseDto>>builder().code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(result)
+                    .build();
         }catch (Exception e){
             log.error("查询奖品列表失败");
-            return Response.fail("查询奖品列表失败");
+            return Response.<List<StrategyAwardListResponseDto>>builder()
+                    .code(ResponseCode.ILLEGAL_PARAMETER.getCode())
+                    .info(ResponseCode.ILLEGAL_PARAMETER.getInfo())
+                    .build();
         }
     }
 
