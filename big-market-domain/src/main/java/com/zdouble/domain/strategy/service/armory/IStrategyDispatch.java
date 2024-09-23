@@ -1,5 +1,7 @@
 package com.zdouble.domain.strategy.service.armory;
 
+import java.util.Date;
+
 public interface IStrategyDispatch {
     /**
      * 执行抽奖调度
@@ -21,5 +23,5 @@ public interface IStrategyDispatch {
      * @param awardId
      * @return
      */
-    Boolean subtractAwardCount(Long strategyId, Integer awardId);
+    Boolean subtractAwardCount(Long strategyId, Integer awardId, Date endTime);
 }

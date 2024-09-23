@@ -32,5 +32,15 @@ public class Constants {
         public final static String ACTIVITY_SKU_STOCK_KEY = "big_market_activity_sku_stock_key";
         public static final String ACTIVITY_SKU_STOCK_LOCK_KEY = "big_market_activity_sku_stock_lock_key";
         public static final String ACTIVITY_SKU_STOCK_QUEUE_KEY = "big_market_sku_stock_queue_key";
+
+        public static final String ACTIVITY_ACCOUNT_SURPLUS_COUNT_KEY = "big_market_activity_account_surplus_count_key";
+        public static final String ACTIVITY_ACCOUNT_MONTH_SURPLUS_COUNT_KEY = "big_market_activity_account_month_surplus_count_key";
+        public static final String ACTIVITY_ACCOUNT_DAY_SURPLUS_COUNT_KEY = "big_market_activity_account_day_surplus_count_key";
+
+        /**
+         * redis锁
+         */
+        public static final String ACTIVITY_ACCOUNT_SURPLUS_COUNT_LOCK = "big_market_activity_account_surplus_count_lock";
+
     }
 }

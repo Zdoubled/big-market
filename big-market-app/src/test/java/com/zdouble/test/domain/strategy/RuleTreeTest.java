@@ -90,7 +90,7 @@ public class RuleTreeTest {
         }});
 
         IDecisionTreeEngine decisionTreeEngine = defaultTreeFactory.openTreeEngine(ruleTreeVO);
-        DefaultTreeFactory.StrategyAwardVO result = decisionTreeEngine.process(100001L, "double", 100);
+        DefaultTreeFactory.StrategyAwardVO result = decisionTreeEngine.process(100001L, "double", 100,null);
 
         log.info("测试结果: " + JSON.toJSONString(result));
     }

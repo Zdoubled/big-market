@@ -20,6 +20,4 @@ public class ActivityAccountEntity {
     private Integer dayCountSurplus;
     private Integer monthCount;
     private Integer monthCountSurplus;
-    private Date createTime;
-    private Date updateTime;
 }

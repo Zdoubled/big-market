@@ -19,6 +19,11 @@
         insert into raffle_activity_account_month (user_id, activity_id, month, month_count, month_count_surplus, create_time, update_time)
         values (#{userId}, #{activityId}, #{month}, #{monthCount}, #{monthCountSurplus}, now(), now())
     </insert>
+    <update id="addAccountQuota" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccountMonth">
+        update raffle_activity_account_month
+        set month_count = month_count + #{monthCount}, month_count_surplus = month_count_surplus + #{monthCountSurplus}, update_time = now()
+        where user_id = #{userId} and activity_id = #{activityId}
+    </update>
     <update id="updateActivityAccountAccountMonthSubtractionQuota" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccountMonth">
         update raffle_activity_account_month
         set month_count_surplus = month_count_surplus - 1, update_time = now()

@@ -10,4 +10,12 @@ public interface IRaffleActivityAccountQuotaService {
      * @return String 返回的订单唯一表示 out_business_no
      */
     String createSkuRechargeOrder(ActivitySkuChargeEntity activitySkuChargeEntity);
+
+    /**
+     * 查询当天用户参与抽奖次数
+     * @param userId
+     * @param activityId
+     * @return
+     */
+    Integer queryRaffleActivityPartakeCount(String userId, Long activityId);
 }

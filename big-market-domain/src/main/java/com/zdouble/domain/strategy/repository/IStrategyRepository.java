@@ -7,6 +7,7 @@ import com.zdouble.domain.strategy.model.vo.RuleTreeVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardKeyStockVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,6 +38,8 @@ public interface IStrategyRepository {
 
     Boolean subtractAwardCount(String cacheKey);
 
+    Boolean subtractAwardCount(String cacheKey, Date endTime);
+
     void awardStockConsumeSendQueue(StrategyAwardKeyStockVO strategyAwardKeyStockVO);
 
     StrategyAwardKeyStockVO takeQueueValue();
@@ -44,4 +47,10 @@ public interface IStrategyRepository {
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
 
     StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId);
+
+    Integer queryTodayUserRaffleCount(String userId, Long strategyId);
+
+    Long queryStrategyIdByActivityId(Long activityId);
+
+    HashMap<String, Integer> queryRuleLockCount(String[] treeIds);
 }

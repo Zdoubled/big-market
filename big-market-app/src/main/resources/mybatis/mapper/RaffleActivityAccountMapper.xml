@@ -45,8 +45,9 @@
         set day_count_surplus = day_count_surplus - 1, update_time = now()
         where user_id = #{userId} and activity_id = #{activityId}
     </update>
-    <select id="queryActivityAccount" resultMap="resultMap">
-        select * from raffle_activity_account where user_id = #{userId} and activity_id = #{activityId}
+    <select id="queryActivityAccount" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount" resultMap="resultMap">
+        select user_id,activity_id,total_count,total_count_surplus,day_count,day_count_surplus,month_count,month_count_surplus
+        from raffle_activity_account where user_id = #{userId} and activity_id = #{activityId}
     </select>
 
 </mapper>

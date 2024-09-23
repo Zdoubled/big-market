@@ -43,6 +43,7 @@ spring:
     topic:
       activity_sku_stock_zero: activity_sku_stock_zero
       award_send: award_send
+      rebate_send: rebate_send
 
     template:
       retry:

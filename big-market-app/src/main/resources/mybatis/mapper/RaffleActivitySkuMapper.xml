@@ -14,9 +14,9 @@
     </resultMap>
     <insert id="insert" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivitySku">
         insert into raffle_activity_sku
-        (sku, activity_id, activity_count_id, stock_count, stock_count_surplus)
+        (sku, activity_id, activity_count_id, stock_count, stock_count_surplus, create_time, update_time)
         values
-        (#{sku}, #{activityId}, #{activityCountId}, #{stockCount}, #{stockCountSurplus})
+        (#{sku}, #{activityId}, #{activityCountId}, #{stockCount}, #{stockCountSurplus}, now(), now())
     </insert>
     <update id="updateSkuStock">
         update raffle_activity_sku
@@ -29,7 +29,7 @@
         where sku = #{sku}
     </update>
     <select id="conditionQueryRaffleActivitySku" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivitySku" resultMap="resultMap">
-        select sku, activity_id, activity_count_id, stock_count, stock_count_surplus, create_time, update_time
+        select sku, activity_id, activity_count_id, stock_count, stock_count_surplus
         from raffle_activity_sku
         <where>
             <if test="sku != null">and sku = #{sku}</if>
@@ -38,7 +38,14 @@
         </where>
     </select>
     <select id="queryActivitySku" parameterType="java.lang.Long" resultMap="resultMap">
-        select * from raffle_activity_sku
+        select sku, activity_id, activity_count_id, stock_count, stock_count_surplus from raffle_activity_sku
         where sku = #{sku}
+    </select>
+    <select id="queryActivitySkuByActivityId" parameterType="java.lang.Long" resultMap="resultMap">
+        select sku, activity_id, activity_count_id, stock_count, stock_count_surplus
+        from raffle_activity_sku where activity_id = #{activityId}
+    </select>
+    <select id="queryActivitySkuList" resultMap="resultMap">
+        select sku, activity_id, activity_count_id, stock_count, stock_count_surplus from raffle_activity_sku
     </select>
 </mapper>

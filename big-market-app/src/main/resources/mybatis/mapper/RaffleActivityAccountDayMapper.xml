@@ -15,6 +15,11 @@
         insert into raffle_activity_account_day (user_id,activity_id,day,day_count,day_count_surplus,create_time,update_time
         ) values (#{userId},#{activityId},#{day},#{dayCount},#{dayCountSurplus},now(),now())
     </insert>
+    <update id="addAccountQuota" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccount">
+        update raffle_activity_account_day
+        set day_count = day_count + #{dayCount}, day_count_surplus = day_count_surplus + #{dayCountSurplus}, update_time = now()
+        where user_id = #{userId} and activity_id = #{activityId}
+    </update>
     <update id="updateActivityAccountAccountDaySubtractionQuota" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccountDay">
         update raffle_activity_account_day
         set day_count_surplus = day_count_surplus - 1, update_time = now()
@@ -25,5 +30,9 @@
     </select>
     <select id="queryActivityAccountDay" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccountDay" resultMap="resultMap">
         select * from raffle_activity_account_day where user_id = #{userId} and activity_id = #{activityId} and day = #{day}
+    </select>
+    <select id="queryRaffleActivityPartakeCount" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityAccountDay" resultType="java.lang.Integer">
+        select day_count - day_count_surplus from raffle_activity_account_day
+        where user_id = #{userId} and activity_id = #{activityId} and day = #{day}
     </select>
 </mapper>

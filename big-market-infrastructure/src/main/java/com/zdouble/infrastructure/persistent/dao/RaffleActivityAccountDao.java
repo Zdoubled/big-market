@@ -12,7 +12,7 @@ public interface RaffleActivityAccountDao {
     int update(RaffleActivityAccount raffleActivityAccount);
 
     @DBRouter(key = "userId")
-    RaffleActivityAccount queryActivityAccount(String userId, Long activityId);
+    RaffleActivityAccount queryActivityAccount(RaffleActivityAccount raffleActivityAccount);
 
     int updateActivityAccountSubtractionQuota(RaffleActivityAccount raffleActivityAccount);
 

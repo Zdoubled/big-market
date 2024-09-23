@@ -1,5 +1,6 @@
 package com.zdouble.domain.strategy.service.armory;
 
+import com.zdouble.domain.activity.repository.IActivityRepository;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyEntity;
 import com.zdouble.domain.strategy.model.entity.StrategyRuleEntity;
@@ -22,6 +23,14 @@ import static com.zdouble.types.enums.ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL;
 public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
     @Resource
     private IStrategyRepository strategyRepository;
+    @Resource
+    private IActivityRepository activityRepository;
+
+    @Override
+    public Boolean assembleLotteryStrategyByActivityId(Long articleId) {
+        Long strategyId = activityRepository.queryStrategyIdByActivityId(articleId);
+        return assembleLotteryStrategy(strategyId);
+    }
 
     @Override
     public Boolean assembleLotteryStrategy(Long strategyId) {
@@ -67,11 +76,12 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
                 .min(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
         //2.获取概率总和
-        BigDecimal sumStrategyRate = strategyAwardList.stream()
+/*        BigDecimal sumStrategyRate = strategyAwardList.stream()
                 .map(StrategyAwardEntity::getAwardRate)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);*/
         //3.计算概率总范围
-        BigDecimal rateRange = sumStrategyRate.divide(minStrategyRate, 0, RoundingMode.CEILING);
+        //BigDecimal rateRange = sumStrategyRate.divide(minStrategyRate, 0, RoundingMode.CEILING);
+        BigDecimal rateRange = BigDecimal.valueOf(convert(minStrategyRate.doubleValue()));
 
         //4.初始化抽奖奖品概率范围
         ArrayList<Integer> strategyAwardSearchRateTable = new ArrayList<>(rateRange.intValue());
@@ -109,9 +119,24 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
     }
 
     @Override
-    public Boolean subtractAwardCount(Long strategyId, Integer awardId) {
+    public Boolean subtractAwardCount(Long strategyId, Integer awardId, Date endTime) {
         String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
-        return strategyRepository.subtractAwardCount(cacheKey);
+        return strategyRepository.subtractAwardCount(cacheKey, endTime);
+    }
+
+    /**
+     * 转换计算，只根据小数位来计算。如【0.01返回100】、【0.009返回1000】、【0.0018返回10000】
+     */
+    private double convert(double min) {
+        if(0 == min) return 1D;
+
+        double current = min;
+        double max = 1;
+        while (current < 1) {
+            current = current * 10;
+            max = max * 10;
+        }
+        return max;
     }
 
 }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 @Component("rule_stock")
 @Slf4j
@@ -22,9 +23,9 @@ public class RuleStockLogicTreeNode implements ILogicTreeNode {
     private IStrategyRepository strategyRepository;
 
     @Override
-    public DefaultTreeFactory.TreeActionEntity logic(Long strategyId, String userId, Integer awardId, String ruleValue) {
+    public DefaultTreeFactory.TreeActionEntity logic(Long strategyId, String userId, Integer awardId, String ruleValue, Date endTime) {
         log.info("strategyId:{},userId:{},awardId:{}",strategyId,userId,awardId);
-        Boolean status = strategyDispatch.subtractAwardCount(strategyId, awardId);
+        Boolean status = strategyDispatch.subtractAwardCount(strategyId, awardId, endTime);
         if (status) {
             //发送消息队列，减缓数据库访问压力
             strategyRepository.awardStockConsumeSendQueue(StrategyAwardKeyStockVO.builder()

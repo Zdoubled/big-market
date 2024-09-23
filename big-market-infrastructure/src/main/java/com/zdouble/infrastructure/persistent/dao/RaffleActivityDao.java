@@ -9,4 +9,8 @@ public interface RaffleActivityDao {
     void insert(RaffleActivity raffleActivity);
 
     RaffleActivity queryRaffleActivityByActivityId(Long activityId);
+
+    Long queryStrategyIdByActivityId(Long articleId);
+
+    Long queryActivityIdByStrategyId(Long strategyId);
 }

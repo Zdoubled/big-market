@@ -36,14 +36,17 @@ public class RaffleActivityPartakeService extends AbstractRaffleActivityPartake{
                 .strategyId(activity.getStrategyId())
                 .orderState(UserRaffleOrderStateVO.create)
                 .orderTime(currentDate)
+                .endTime(activity.getEndDateTime())
                 .build();
     }
 
     @Override
     protected CreatePartakeOrderAggregate doFilter(String userId, Long activityId, Date currentDate) {
+        /** 此处存在并发问题，高并发情况下会导致额度扣减到负数, 已结合reids解决*/
         // 1. 查看总账户额度
         ActivityAccountEntity activityAccountEntity = activityRepository.queryActivityAccount(userId, activityId);
         if (null == activityAccountEntity || activityAccountEntity.getTotalCountSurplus() <= 0) {
+            log.info("用户[{}]没有足够的额度，无法参与活动[{}]", userId, activityId);
             throw new AppException(ResponseCode.ACCOUNT_QUOTA_ERROR.getCode(), ResponseCode.ACCOUNT_QUOTA_ERROR.getInfo());
         }
         String month = simpleMonthDateFormat.format(currentDate);
