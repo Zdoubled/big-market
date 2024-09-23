@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zdouble.infrastructure.persistent.dao.DailyBehaviorRebateDao">
+    <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.DailyBehaviorRebate">
+        <id property="id" column="id"/>
+        <result property="behaviorType" column="behavior_type"/>
+        <result property="rebateDesc" column="rebate_desc"/>
+        <result property="rebateType" column="rebate_type"/>
+        <result property="rebateConfig" column="rebate_config"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="queryDailyBehaviorRebateByBehaviorType" parameterType="java.lang.String" resultMap="resultMap">
+        select behavior_type,rebate_desc,rebate_type,rebate_config,state
+        from daily_behavior_rebate where behavior_type = #{behaviorType} and state = 'open'
+    </select>
+</mapper>

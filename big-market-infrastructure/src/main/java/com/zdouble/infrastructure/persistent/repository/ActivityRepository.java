@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RLock;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -128,28 +129,14 @@ public class ActivityRepository implements IActivityRepository {
             // 构建订单对象
         ActivityOrderEntity activityOrderEntity = createOrderAggregate.getActivityOrderEntity();
         RaffleActivityOrder raffleActivityOrder = new RaffleActivityOrder();
-        raffleActivityOrder.setUserId(activityOrderEntity.getUserId());
-        raffleActivityOrder.setOrderId(activityOrderEntity.getOrderId());
-        raffleActivityOrder.setDayCount(activityOrderEntity.getDayCount());
-        raffleActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
-        raffleActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
-        raffleActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
-        raffleActivityOrder.setOutBusinessNo(activityOrderEntity.getOutBusinessNo());
-        raffleActivityOrder.setActivityName(activityOrderEntity.getActivityName());
-        raffleActivityOrder.setActivityId(activityOrderEntity.getActivityId());
-        raffleActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
-        raffleActivityOrder.setSku(activityOrderEntity.getSku());
+        BeanUtils.copyProperties(activityOrderEntity, raffleActivityOrder, "state");
         raffleActivityOrder.setState(activityOrderEntity.getState().getCode());
         // 构建账户对象
         RaffleActivityAccount raffleActivityAccount = new RaffleActivityAccount();
-        raffleActivityAccount.setActivityId(activityOrderEntity.getActivityId());
-        raffleActivityAccount.setUserId(createOrderAggregate.getUserId());
-        raffleActivityAccount.setDayCount(createOrderAggregate.getDayCount());
-        raffleActivityAccount.setMonthCount(createOrderAggregate.getMonthCount());
-        raffleActivityAccount.setTotalCount(createOrderAggregate.getTotalCount());
-        raffleActivityAccount.setDayCountSurplus(createOrderAggregate.getDayCountSurplus());
-        raffleActivityAccount.setMonthCountSurplus(createOrderAggregate.getMonthCountSurplus());
-        raffleActivityAccount.setTotalCountSurplus(createOrderAggregate.getTotalCountSurplus());
+        BeanUtils.copyProperties(activityOrderEntity, raffleActivityAccount);
+        raffleActivityAccount.setTotalCountSurplus(activityOrderEntity.getTotalCount());
+        raffleActivityAccount.setMonthCountSurplus(activityOrderEntity.getMonthCount());
+        raffleActivityAccount.setDayCountSurplus(activityOrderEntity.getDayCount());
         try{
             dbRouterStrategy.doRouter(createOrderAggregate.getUserId());
             transactionTemplate.execute(status -> {
@@ -159,6 +146,10 @@ public class ActivityRepository implements IActivityRepository {
                     if (count == 0){
                         raffleActivityAccountDao.insert(raffleActivityAccount);
                     }
+                    // 更新月账户(存在则更新)
+                    raffleActivityAccountMonthDao.addAccountQuota(raffleActivityAccount);
+                    // 更新日账户(存在则更新)
+                    raffleActivityAccountDayDao.addAccountQuota(raffleActivityAccount);
                     return 1;
                 }catch (DuplicateKeyException e) {
                     status.setRollbackOnly();
@@ -183,7 +174,7 @@ public class ActivityRepository implements IActivityRepository {
         long surplus = redisService.decr(cacheKey);
         if (surplus == 0){
             // 发送消息队列，通知清空异步待处理的订单（sku）
-            String topic = activitySkuStockZeroMessageEvent.topic() + sku;
+            String topic = activitySkuStockZeroMessageEvent.topic();
             BaseEvent.EventMessage<Long> eventMessage = activitySkuStockZeroMessageEvent.buildEventMessage(sku);
             eventPublisher.publish(topic, eventMessage);
         }else if (surplus < 0){

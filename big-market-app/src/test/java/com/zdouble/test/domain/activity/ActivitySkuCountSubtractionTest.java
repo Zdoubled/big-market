@@ -32,7 +32,7 @@ public class ActivitySkuCountSubtractionTest {
 
     @Test
     public void test() throws InterruptedException {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100; i++) {
             try {
                 ActivitySkuChargeEntity charge = ActivitySkuChargeEntity.builder()
                         .sku(9011L)
