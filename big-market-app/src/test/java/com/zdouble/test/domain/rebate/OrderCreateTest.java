@@ -23,7 +23,7 @@ public class OrderCreateTest {
     public void test_createOrder(){
         List<String> order = behaviorRebateService.createOrder(UserBehaviorEntity.builder()
                 .userId("xiaofuge")
-                .behaviorType(BehaviorTypeVO.SIGN)
+                .behaviorType(BehaviorTypeVO.sign)
                 .build()
         );
         order.forEach(log::info);
