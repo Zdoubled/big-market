@@ -3,7 +3,6 @@ package com.zdouble.trigger.http;
 import com.alibaba.fastjson.JSON;
 import com.zdouble.IRaffleStrategyService;
 import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
-import com.zdouble.domain.activity.service.IRaffleActivityPartakeService;
 import com.zdouble.domain.strategy.IRaffleRule;
 import com.zdouble.domain.strategy.model.entity.RaffleAwardEntity;
 import com.zdouble.domain.strategy.model.entity.RaffleFactorEntity;
@@ -86,7 +85,7 @@ public class RaffleControllerStrategy implements IRaffleStrategyService {
                     .filter(StringUtils::isNotBlank)
                     .toArray(String[]::new);
             HashMap<String, Integer> resultMap = raffleRule.queryRuleLockCount(treeIds);
-            Integer raffleActivityPartakeCount = raffleActivityAccountQuotaService.queryRaffleActivityPartakeCount(strategyAwardListRequestDto.getUserId(), strategyAwardListRequestDto.getActivityId());
+            Integer raffleActivityPartakeCount = raffleActivityAccountQuotaService.queryRaffleActivityTotalPartakeCount(strategyAwardListRequestDto.getUserId(), strategyAwardListRequestDto.getActivityId());
 
             List<StrategyAwardListResponseDto> result = strategyAwardEntities.stream().map(strategyAwardEntity -> {
                 Integer ruleLockCount = resultMap.get(strategyAwardEntity.getRuleModels());

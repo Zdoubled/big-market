@@ -28,6 +28,8 @@ public class UserBehaviorRebateOrder {
     private String rebateConfig;
     /** 唯一id */
     private String bizId;
+    /** 业务单号 */
+    private String outBusinessNo;
     private Date createTime;
     private Date updateTime;
 }

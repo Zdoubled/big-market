@@ -1,6 +1,7 @@
 package com.zdouble.domain.award.service;
 
 import com.zdouble.domain.award.event.UserAwardSendMessageEvent;
+import com.zdouble.domain.award.model.entity.DistributeAwardEntity;
 import com.zdouble.domain.award.model.entity.UserAwardRecordEntity;
 
 /**
@@ -13,4 +14,10 @@ public interface IAwardService {
      * @param userAwardRecordEntity
      */
     void saveUserAwardRecord(UserAwardRecordEntity userAwardRecordEntity);
+
+    /**
+     * 奖品发放接口
+     * @param distributeAwardEntity
+     */
+    void giveOutPrizes(DistributeAwardEntity distributeAwardEntity);
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zdouble.infrastructure.persistent.dao.UserCreditOrderDao">
+
+    <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.UserCreditOrder">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="tradeName" column="trade_name"/>
+        <result property="tradeType" column="trade_type"/>
+        <result property="tradeAmount" column="trade_amount"/>
+        <result property="outBusinessNo" column="out_business_no"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.zdouble.infrastructure.persistent.po.UserCreditOrder">
+        insert into user_credit_order (user_id, order_id, trade_name, trade_type, trade_amount, out_business_no, create_time, update_time)
+        values (#{userId}, #{orderId}, #{tradeName}, #{tradeType}, #{tradeAmount}, #{outBusinessNo}, now(), now())
+    </insert>
+</mapper>

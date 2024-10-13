@@ -45,7 +45,7 @@ public interface IActivityRepository {
 
     Long queryStrategyIdByActivityId(Long articleId);
 
-    Integer queryRaffleActivityPartakeCount(String userId, Long activityId);
+    Integer queryRaffleActivityTotalPartakeCount(String userId, Long activityId);
 
     List<ActivitySkuEntity> queryActivitySkuList();
 }

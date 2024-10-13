@@ -22,11 +22,12 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
     private IStrategyRepository strategyRepository;
     @Resource
     private IStrategyDispatch strategyDispatch;
-
-    private final Long userScore = 0L;
     @Override
     public DefaultLogicChainFactory.StrategyAwardVO logic(Long strategyId, String userId) {
         log.info("责任链过滤，策略ID：{}，用户ID：{}，规则模型：{}", strategyId, userId, ruleModel());
+        // 查询用户总抽奖次数
+        Integer userScore = strategyRepository.queryActivityAccountTotalUseCount(userId, strategyId);
+        // 查询权重规则配置
         String ruleValue = strategyRepository.queryStrategyRuleValue(strategyId, ruleModel());
         Map<Long, String> ruleMap = analyzeRuleValue(ruleValue);
         Long ruleScore = ruleMap.keySet().stream()

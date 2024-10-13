@@ -3,6 +3,7 @@ package com.zdouble.domain.strategy.service.raffle;
 import com.zdouble.domain.strategy.IRaffleRule;
 import com.zdouble.domain.strategy.model.entity.StrategyAwardEntity;
 import com.zdouble.domain.strategy.model.vo.RuleTreeVO;
+import com.zdouble.domain.strategy.model.vo.RuleWeightVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardKeyStockVO;
 import com.zdouble.domain.strategy.model.vo.StrategyAwardRuleModelVO;
 import com.zdouble.domain.strategy.repository.IStrategyRepository;
@@ -17,9 +18,11 @@ import com.zdouble.domain.strategy.service.rule.tree.factory.engine.IDecisionTre
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -77,5 +80,41 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy implements IRa
     public HashMap<String, Integer> queryRuleLockCount(String[] treeIds) {
         if (null == treeIds || treeIds.length == 0) return new HashMap<String,Integer>();
         return strategyRepository.queryRuleLockCount(treeIds);
+    }
+
+    @Override
+    public List<RuleWeightVO> queryAwardRuleWeightByArticleId(Long articleId) {
+        // 1. 查询活动配置奖品信息
+        Long strategyId = strategyRepository.queryStrategyIdByActivityId(articleId);
+        List<StrategyAwardEntity> strategyAwardEntities = strategyRepository.queryStrategyAwardList(strategyId);
+        // 2. 查询活动权重策略配置
+        String ruleValue = strategyRepository.queryStrategyRuleValue(strategyId, "rule_weight");
+        String[] split = ruleValue.split(" ");
+        if(split.length == 0) return null;
+        ArrayList<RuleWeightVO> ruleWeightVOS = new ArrayList<>();
+        for (String ruleWeight : split) {
+            String[] ruleWeightSplit = ruleWeight.split(":");
+            String[] awardIds = ruleWeightSplit[1].split(",");
+            List<RuleWeightVO.Award> awards = strategyAwardEntities.stream().filter(strategyAwardEntity -> {
+                for (String awardId : awardIds) {
+                    if (Integer.valueOf(awardId).equals(strategyAwardEntity.getAwardId())) {
+                        return true;
+                    }
+                }
+                return false;
+            }).map(strategyAwardEntity -> {
+                return RuleWeightVO.Award.builder()
+                        .awardId(strategyAwardEntity.getAwardId())
+                        .awardTitle(strategyAwardEntity.getAwardTitle())
+                        .build();
+            }).collect(Collectors.toList());
+
+            RuleWeightVO ruleWeightVO = RuleWeightVO.builder()
+                    .wight(Integer.valueOf(ruleWeightSplit[0]))
+                    .awardList(awards)
+                    .build();
+            ruleWeightVOS.add(ruleWeightVO);
+        }
+        return ruleWeightVOS;
     }
 }

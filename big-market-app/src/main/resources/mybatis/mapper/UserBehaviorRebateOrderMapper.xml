@@ -10,13 +10,23 @@
         <result property="rebateType" column="rebate_type"/>
         <result property="rebateConfig" column="rebate_config"/>
         <result property="bizId" column="biz_id"/>
+        <result property="outBusinessNo" column="out_business_no"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
     <insert id="insertUserBehaviorRebateOrder" parameterType="com.zdouble.infrastructure.persistent.po.UserBehaviorRebateOrder">
         insert into user_behavior_rebate_order
-        (user_id, order_id, behavior_type, rebate_desc, rebate_type, rebate_config, biz_id, create_time, update_time)
+        (user_id, order_id, behavior_type, rebate_desc, rebate_type, rebate_config, out_business_no, biz_id, create_time, update_time)
         values
-        (#{userId}, #{orderId}, #{behaviorType}, #{rebateDesc}, #{rebateType}, #{rebateConfig}, #{bizId}, now(), now())
+        (#{userId}, #{orderId}, #{behaviorType}, #{rebateDesc}, #{rebateType}, #{rebateConfig}, #{outBusinessNo}, #{bizId}, now(), now())
     </insert>
+    <select id="existSignOrder" resultType="java.lang.Integer">
+        select count(1) from user_behavior_rebate_order
+        where user_id = #{userId} and out_business_no = #{outBusinessNo}
+    </select>
+    <select id="queryUserBehaviorRebateOrder" parameterType="com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity" resultMap="resultMap">
+        select user_id, order_id, behavior_type, rebate_desc, rebate_type, rebate_config, biz_id, out_business_no
+        from user_behavior_rebate_order
+        where user_id = #{userId} and out_business_no = #{outBusinessNo} and behavior_type = #{behaviorType}
+    </select>
 </mapper>

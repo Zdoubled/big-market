@@ -1,5 +1,6 @@
 package com.zdouble.domain.activity.service;
 
+import com.zdouble.domain.activity.model.entity.ActivityAccountEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
 
 public interface IRaffleActivityAccountQuotaService {
@@ -17,5 +18,12 @@ public interface IRaffleActivityAccountQuotaService {
      * @param activityId
      * @return
      */
-    Integer queryRaffleActivityPartakeCount(String userId, Long activityId);
+    Integer queryRaffleActivityTotalPartakeCount(String userId, Long activityId);
+
+    /**
+     * 查询用户账户额度信息
+     * @param activityAccountEntity
+     * @return
+     */
+    ActivityAccountEntity queryActivityAccountQuotaService(ActivityAccountEntity activityAccountEntity);
 }

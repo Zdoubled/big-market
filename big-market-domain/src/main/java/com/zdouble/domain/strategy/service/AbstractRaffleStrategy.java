@@ -42,8 +42,7 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         //前置规则过滤，责任链过滤
         DefaultLogicChainFactory.StrategyAwardVO chainStrategyAwardVO = raffleLogicChain(strategyId, userId);
         if(!DefaultLogicChainFactory.LogicModel.RULE_DEFAULT.getCode().equals(chainStrategyAwardVO.getLogicModel())){
-            // TODO awardConfig 暂空，黑名单指定积分奖品，后续需要再库表配置上对应的1积分值.
-            return buildRaffleAwardEntity(strategyId, chainStrategyAwardVO.getAwardId(), null);
+            return buildRaffleAwardEntity(strategyId, chainStrategyAwardVO.getAwardId(), chainStrategyAwardVO.getAwardRuleValue());
         }
 
         //后置规则过滤，规则树过滤

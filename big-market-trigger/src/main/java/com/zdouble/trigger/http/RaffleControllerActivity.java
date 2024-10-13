@@ -1,8 +1,9 @@
 package com.zdouble.trigger.http;
 
 import com.zdouble.IRaffleActivityService;
-import com.zdouble.domain.activity.model.entity.PartakeRaffleActivityEntity;
+import com.zdouble.domain.activity.model.entity.ActivityAccountEntity;
 import com.zdouble.domain.activity.model.entity.UserRaffleOrderEntity;
+import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
 import com.zdouble.domain.activity.service.IRaffleActivityPartakeService;
 import com.zdouble.domain.activity.service.armory.IActivityArmory;
 import com.zdouble.domain.award.model.entity.UserAwardRecordEntity;
@@ -10,13 +11,15 @@ import com.zdouble.domain.award.model.vo.AwardStateVO;
 import com.zdouble.domain.award.service.IAwardService;
 import com.zdouble.domain.rebate.IBehaviorRebateService;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorEntity;
+import com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity;
 import com.zdouble.domain.rebate.model.vo.BehaviorTypeVO;
+import com.zdouble.domain.strategy.IRaffleRule;
 import com.zdouble.domain.strategy.model.entity.RaffleAwardEntity;
 import com.zdouble.domain.strategy.model.entity.RaffleFactorEntity;
+import com.zdouble.domain.strategy.model.vo.RuleWeightVO;
 import com.zdouble.domain.strategy.service.IRaffleStrategy;
 import com.zdouble.domain.strategy.service.armory.IStrategyArmory;
-import com.zdouble.dto.ActivityDrawRequestDto;
-import com.zdouble.dto.ActivityDrawResponseDto;
+import com.zdouble.dto.*;
 import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
 import com.zdouble.types.model.Response;
@@ -25,8 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController()
@@ -46,6 +52,10 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     private IAwardService awardService;
     @Resource
     private IBehaviorRebateService behaviorRebateService;
+    @Resource
+    private IRaffleActivityAccountQuotaService raffleActivityAccountQuotaService;
+    @Resource
+    private IRaffleRule raffleRule;
 
 
     @Override
@@ -91,6 +101,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                             .userId(userId)
                             .orderId(userRaffleOrder.getOrderId())
                             .awardId(raffleAwardEntity.getAwardId())
+                            .awardConfig(raffleAwardEntity.getAwardConfig())
                             .awardTitle(raffleAwardEntity.getAwardTitle())
                             .awardTime(new Date())
                             .awardState(AwardStateVO.create)
@@ -100,6 +111,8 @@ public class RaffleControllerActivity implements IRaffleActivityService {
             // 5. 返回抽奖结果
             return Response.success(ActivityDrawResponseDto.builder()
                     .awardId(raffleAwardEntity.getAwardId())
+                    .orderId(userAwardRecordEntity.getOrderId())
+                    .awardConfig(raffleAwardEntity.getAwardConfig())
                     .awardIndex(raffleAwardEntity.getSort())
                     .awardTitle(raffleAwardEntity.getAwardTitle())
                     .build());
@@ -156,6 +169,128 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())
                     .data(Boolean.FALSE)
+                    .build();
+        }
+    }
+
+    @Override
+    @RequestMapping(value = "is_calendar_sign_rebate", method = RequestMethod.POST)
+    public Response<Boolean> isCalendarSignRebate(@RequestParam String userId) {
+        try {
+            // 1. 参数校验
+            if (StringUtils.isBlank(userId)) {
+                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
+            }
+            // 2. 调用返利查询服务
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String outBusinessNo = sdf.format(new Date());
+            List<UserBehaviorRebateOrderEntity> rebateOrders = behaviorRebateService.isCalendarSignRebate(userId, outBusinessNo);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(!rebateOrders.isEmpty())
+                    .build();
+        }catch (AppException e){
+            return Response.<Boolean>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @Override
+    @RequestMapping(value = "query_user_activity_account", method = RequestMethod.POST)
+    public Response<ActivityAccountQuotaResponseDto> userAccountQuota(@RequestBody ActivityAccountQuotaRequestDto activityAccountQuotaRequestDto) {
+        // 1. 参数校验
+        try {
+            if (null == activityAccountQuotaRequestDto) {
+                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
+            }
+            ActivityAccountEntity activityAccountEntity = ActivityAccountEntity.builder()
+                    .userId(activityAccountQuotaRequestDto.getUserId())
+                    .activityId(activityAccountQuotaRequestDto.getActivityId())
+                    .build();
+            activityAccountEntity = raffleActivityAccountQuotaService.queryActivityAccountQuotaService(activityAccountEntity);
+
+            return Response.<ActivityAccountQuotaResponseDto>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(ActivityAccountQuotaResponseDto.builder()
+                            .totalCount(activityAccountEntity.getTotalCount())
+                            .totalCountSurplus(activityAccountEntity.getTotalCountSurplus())
+                            .monthCount(activityAccountEntity.getMonthCount())
+                            .monthCountSurplus(activityAccountEntity.getMonthCountSurplus())
+                            .dayCount(activityAccountEntity.getDayCount())
+                            .dayCountSurplus(activityAccountEntity.getDayCountSurplus())
+                            .build())
+                    .build();
+        }catch (AppException e){
+            log.error("用户额度查询失败 userId：{}", activityAccountQuotaRequestDto.getUserId(), e);
+            return Response.<ActivityAccountQuotaResponseDto>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            log.error("用户额度查询失败 userId：{}", activityAccountQuotaRequestDto.getUserId());
+            return Response.<ActivityAccountQuotaResponseDto>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @Override
+    @RequestMapping(value = "query_raffle_strategy_rule_weight", method = RequestMethod.POST)
+    public Response<List<RaffleStrategyRuleWeightResponseDto>> queryRaffleStrategyRuleWeight(@RequestBody RaffleStrategyRuleWeightRequestDto dto) {
+        try {
+            // 1. 参数校验
+            if (null == dto || StringUtils.isBlank(dto.getUserId()) || null == dto.getActivityId()) {
+                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
+            }
+            // 2. 查询权重规则配置
+            List<RuleWeightVO> ruleWeightVOS = raffleRule.queryAwardRuleWeightByArticleId(dto.getActivityId());
+            // 3. 查询用户总抽奖次数
+            Integer count = raffleActivityAccountQuotaService.queryRaffleActivityTotalPartakeCount(dto.getUserId(), dto.getActivityId());
+
+            // 4. 装配结果
+            ArrayList<RaffleStrategyRuleWeightResponseDto> responseDtos = new ArrayList<>();
+            for (RuleWeightVO ruleWeightVO : ruleWeightVOS) {
+                List<RuleWeightVO.Award> awardList = ruleWeightVO.getAwardList();
+                List<RaffleStrategyRuleWeightResponseDto.AwardVO> awardVOS = awardList.stream().map(award -> {
+                    return RaffleStrategyRuleWeightResponseDto.AwardVO.builder()
+                            .awardId(award.getAwardId())
+                            .awardTitle(award.getAwardTitle())
+                            .build();
+                }).collect(Collectors.toList());
+                responseDtos.add(RaffleStrategyRuleWeightResponseDto.builder()
+                        .ruleWeightCount(ruleWeightVO.getWight())
+                        .userActivityAccountTotalUseCount(count)
+                        .awardVOS(awardVOS)
+                        .build()
+                );
+            }
+
+            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(responseDtos)
+                    .build();
+        }catch (AppException e){
+            log.error("权重配置失败 userId：{}", dto.getUserId());
+            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            log.error("权重配置失败 userId：{}", dto.getUserId());
+            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
                     .build();
         }
     }

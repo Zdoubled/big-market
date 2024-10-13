@@ -2,18 +2,18 @@ package com.zdouble.infrastructure.persistent.repository;
 
 import cn.bugstack.middleware.db.router.strategy.IDBRouterStrategy;
 import com.alibaba.fastjson.JSON;
+import com.zdouble.domain.award.aggregrate.GiveOutPrizesAggregate;
 import com.zdouble.domain.award.aggregrate.UserAwardRecordAggregate;
-import com.zdouble.domain.award.event.UserAwardSendMessageEvent;
 import com.zdouble.domain.award.model.entity.TaskEntity;
+import com.zdouble.domain.award.model.entity.UserAwardCreditEntity;
 import com.zdouble.domain.award.model.entity.UserAwardRecordEntity;
-import com.zdouble.domain.award.model.vo.TaskStateVO;
-import com.zdouble.domain.award.reporsitory.IAwardRecordRepository;
+import com.zdouble.domain.award.model.vo.UserCreditAccountStatusVO;
+import com.zdouble.domain.award.reporsitory.IAwardRepository;
 import com.zdouble.infrastructure.event.EventPublisher;
-import com.zdouble.infrastructure.persistent.dao.TaskDao;
-import com.zdouble.infrastructure.persistent.dao.UserAwardRecordDao;
-import com.zdouble.infrastructure.persistent.dao.UserRaffleOrderDao;
+import com.zdouble.infrastructure.persistent.dao.*;
 import com.zdouble.infrastructure.persistent.po.Task;
 import com.zdouble.infrastructure.persistent.po.UserAwardRecord;
+import com.zdouble.infrastructure.persistent.po.UserCreditAccount;
 import com.zdouble.infrastructure.persistent.po.UserRaffleOrder;
 import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
@@ -25,12 +25,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Repository
 @Slf4j
-public class AwardRecordRepository implements IAwardRecordRepository {
+public class AwardRepository implements IAwardRepository {
 
     @Value("${spring.rabbitmq.topic.award_send}")
     private String topic;
@@ -41,6 +40,10 @@ public class AwardRecordRepository implements IAwardRecordRepository {
     private UserAwardRecordDao userAwardRecordDao;
     @Resource
     private UserRaffleOrderDao userRaffleOrderDao;
+    @Resource
+    private UserCreditAccountDao userCreditAccountDao;
+    @Resource
+    private AwardDao awardDao;
     @Resource
     private TaskDao taskDao;
     @Resource
@@ -113,5 +116,54 @@ public class AwardRecordRepository implements IAwardRecordRepository {
                 log.info("发送奖品发放mq失败");
             }
         });
+    }
+
+    @Override
+    public void saveGiveOutPrizesAggregate(GiveOutPrizesAggregate giveOutPrizesAggregate) {
+        try{
+            routerStrategy.doRouter(giveOutPrizesAggregate.getUserId());
+            transactionTemplate.execute(status -> {
+                // 更新用户积分对象
+                UserAwardCreditEntity userAwardCreditEntity = giveOutPrizesAggregate.getUserAwardCreditEntity();
+                UserCreditAccount creditAccountUpdate = UserCreditAccount.builder()
+                        .userId(userAwardCreditEntity.getUserId())
+                        .totalAmount(userAwardCreditEntity.getCreditAward())
+                        .availableAmount(userAwardCreditEntity.getCreditAward())
+                        .build();
+
+                // 更新中奖记录对象
+                UserAwardRecordEntity userAwardRecordEntity = giveOutPrizesAggregate.getUserAwardRecordEntity();
+                UserAwardRecord recordUpdate = UserAwardRecord.builder()
+                        .userId(userAwardRecordEntity.getUserId())
+                        .orderId(userAwardRecordEntity.getOrderId())
+                        .awardId(userAwardRecordEntity.getAwardId())
+                        .awardState(userAwardRecordEntity.getAwardState().getCode())
+                        .build();
+                try {
+                    int count = userCreditAccountDao.updateUserCreditAccount(creditAccountUpdate);
+                    if (count == 0) {
+                        UserCreditAccount creditAccount = UserCreditAccount.builder()
+                                .userId(creditAccountUpdate.getUserId())
+                                .totalAmount(creditAccountUpdate.getTotalAmount())
+                                .availableAmount(creditAccountUpdate.getAvailableAmount())
+                                .accountStatus(UserCreditAccountStatusVO.open.getCode())
+                                .build();
+                        userCreditAccountDao.insert(creditAccount);
+                    }
+                    userAwardRecordDao.updateUserAwardRecordState(recordUpdate);
+                } catch (Exception e) {
+                    log.error("奖品发放数据库更新异常", e);
+                    status.setRollbackOnly();
+                }
+                return 1;
+            });
+        }finally {
+            routerStrategy.clear();
+        }
+    }
+
+    @Override
+    public String queryAwardKey(Integer awardId) {
+        return awardDao.queryAwardKey(awardId);
     }
 }

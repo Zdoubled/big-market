@@ -39,6 +39,10 @@ public class UserAwardSendMessageEvent extends BaseEvent<UserAwardSendMessageEve
         private String userId;
         // 奖品id
         private Integer awardId;
+        // 订单id
+        private String orderId;
+        // 奖品配置
+        private String awardConfig;
         // 奖品标题
         private String awardTitle;
     }

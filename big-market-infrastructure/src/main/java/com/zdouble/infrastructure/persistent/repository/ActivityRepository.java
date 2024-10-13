@@ -467,15 +467,14 @@ public class ActivityRepository implements IActivityRepository {
     }
 
     @Override
-    public Integer queryRaffleActivityPartakeCount(String userId, Long activityId) {
-        RaffleActivityAccountDay activityAccountDay = RaffleActivityAccountDay.builder()
-                .activityId(activityId)
+    public Integer queryRaffleActivityTotalPartakeCount(String userId, Long activityId) {
+        RaffleActivityAccount activityAccount = RaffleActivityAccount.builder()
                 .userId(userId)
-                .day(ActivityAccountDayEntity.getDay())
+                .activityId(activityId)
                 .build();
-        Integer raffleActivityPartakeCount = raffleActivityAccountDayDao.queryRaffleActivityPartakeCount(activityAccountDay);
-        if (null == raffleActivityPartakeCount) return 0;
-        return raffleActivityPartakeCount;
+        activityAccount = raffleActivityAccountDao.queryActivityAccount(activityAccount);
+        if (null == activityAccount) return 0;
+        return activityAccount.getTotalCount() - activityAccount.getTotalCountSurplus();
     }
 
     @Override

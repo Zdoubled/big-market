@@ -27,6 +27,9 @@ public class UserBehaviorRebateOrderEntity {
     private RebateTypeVO rebateType;
     /** 返利配置 */
     private String rebateConfig;
+    /**  业务单号 */
+    private String outBusinessNo;
     /** 唯一id */
     private String bizId;
+
 }

@@ -19,6 +19,7 @@ public class UserAwardRecordEntity {
     private String orderId;
     private Integer awardId;
     private String awardTitle;
+    private String awardConfig;
     private Date awardTime;
     private AwardStateVO awardState;
 }
