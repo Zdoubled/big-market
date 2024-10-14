@@ -1,28 +1,33 @@
 package com.zdouble.domain.activity.service.quota;
 
-import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
+import com.zdouble.domain.activity.model.aggregate.CreateQuotaOrderAggregate;
 import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
 import com.zdouble.domain.activity.model.pojo.OrderStateVO;
 import com.zdouble.domain.activity.repository.IActivityRepository;
 import com.zdouble.domain.activity.service.IRaffleActivitySkuStockService;
+import com.zdouble.domain.activity.service.quota.policy.ITradePolicy;
 import com.zdouble.domain.activity.service.quota.rule.factory.DefaultActionChainFactory;
+import com.zdouble.domain.credit.model.entity.DeliveryOrderEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAccountQuota implements IRaffleActivitySkuStockService {
-    public RaffleActivityAccountQuotaService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory) {
-        super(activityRepository, defaultActionChainFactory);
+
+
+    public RaffleActivityAccountQuotaService(IActivityRepository activityRepository, DefaultActionChainFactory defaultActionChainFactory, Map<String, ITradePolicy> tradePolicyMap) {
+        super(activityRepository, defaultActionChainFactory, tradePolicyMap);
     }
 
     @Override
-    protected CreateOrderAggregate buildOrderAggregate(ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity, ActivitySkuChargeEntity activitySkuChargeEntity) {
+    protected CreateQuotaOrderAggregate buildOrderAggregate(ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity, ActivitySkuChargeEntity activitySkuChargeEntity) {
         ActivityOrderEntity activityOrderEntity = ActivityOrderEntity.builder()
                 .sku(activitySkuEntity.getSku())
                 .userId(activitySkuChargeEntity.getUserId())
@@ -34,11 +39,12 @@ public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAcc
                 .activityName(activityEntity.getActivityName())
                 .strategyId(activityEntity.getStrategyId())
                 .orderTime(new Date())
-                .state(OrderStateVO.completed)
+                .payAmount(activitySkuEntity.getProductAmount())
+                .state(OrderStateVO.wait_pay)
                 .outBusinessNo(activitySkuChargeEntity.getOutBusinessNo())
                 .build();
 
-        return CreateOrderAggregate.builder()
+        return CreateQuotaOrderAggregate.builder()
                 .userId(activitySkuChargeEntity.getUserId())
                 .activityId(activitySkuEntity.getActivityId())
                 .dayCount(activityCountEntity.getDayCount())
@@ -50,12 +56,6 @@ public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAcc
                 .activityOrderEntity(activityOrderEntity)
                 .build();
     }
-
-    @Override
-    protected void doSaveOrder(CreateOrderAggregate createOrderAggregate) {
-        activityRepository.saveOrderAggregate(createOrderAggregate);
-    }
-
 
     @Override
     public ActivitySkuStockVO takeQueueValue(Long sku) throws InterruptedException {
@@ -90,5 +90,10 @@ public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAcc
     @Override
     public ActivityAccountEntity queryActivityAccountQuotaService(ActivityAccountEntity activityAccountEntity) {
         return activityRepository.queryActivityAccount(activityAccountEntity.getUserId(), activityAccountEntity.getActivityId());
+    }
+
+    @Override
+    public void updateOrder(DeliveryOrderEntity deliveryOrderEntity) {
+        activityRepository.updateOrder(deliveryOrderEntity);
     }
 }

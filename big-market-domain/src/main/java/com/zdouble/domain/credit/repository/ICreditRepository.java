@@ -1,8 +1,7 @@
 package com.zdouble.domain.credit.repository;
 
-import com.zdouble.domain.credit.aggregate.UserCreditRechargeAggregate;
-import com.zdouble.domain.credit.model.entity.UserCreditRechargeEntity;
+import com.zdouble.domain.credit.aggregate.TradeAggregate;
 
 public interface ICreditRepository {
-    void doUserCreditRecharge(UserCreditRechargeAggregate userCreditRechargeAggregate);
+    void doSaveUserCreditAdjust(TradeAggregate tradeAggregate);
 }

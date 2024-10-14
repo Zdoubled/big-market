@@ -1,19 +1,32 @@
 package com.zdouble.infrastructure.persistent.repository;
 
 import cn.bugstack.middleware.db.router.strategy.IDBRouterStrategy;
-import com.zdouble.domain.credit.aggregate.UserCreditRechargeAggregate;
+import com.alibaba.fastjson.JSON;
+import com.zdouble.domain.activity.event.CreditAdjustSuccessMessageEvent;
+import com.zdouble.domain.activity.model.aggregate.CreateQuotaOrderAggregate;
+import com.zdouble.domain.activity.model.entity.ActivityOrderEntity;
+import com.zdouble.domain.credit.aggregate.TradeAggregate;
+import com.zdouble.domain.credit.model.entity.TaskEntity;
 import com.zdouble.domain.credit.model.entity.UserCreditAccountEntity;
 import com.zdouble.domain.credit.model.entity.UserCreditOrderEntity;
-import com.zdouble.domain.credit.model.entity.UserCreditRechargeEntity;
+import com.zdouble.domain.credit.model.vo.TaskStateVO;
+import com.zdouble.domain.credit.model.vo.TradeTypeVO;
 import com.zdouble.domain.credit.repository.ICreditRepository;
+import com.zdouble.infrastructure.event.EventPublisher;
+import com.zdouble.infrastructure.persistent.dao.TaskDao;
 import com.zdouble.infrastructure.persistent.dao.UserCreditAccountDao;
 import com.zdouble.infrastructure.persistent.dao.UserCreditOrderDao;
+import com.zdouble.infrastructure.persistent.po.Task;
 import com.zdouble.infrastructure.persistent.po.UserCreditAccount;
 import com.zdouble.infrastructure.persistent.po.UserCreditOrder;
 import com.zdouble.infrastructure.persistent.redis.RedissonService;
 import com.zdouble.types.common.Constants;
+import com.zdouble.types.event.BaseEvent;
+import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.redisson.api.RLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -30,22 +43,30 @@ public class CreditRepository implements ICreditRepository {
     @Resource
     private UserCreditAccountDao userCreditAccountDao;
     @Resource
+    private TaskDao taskDao;
+    @Resource
     private IDBRouterStrategy routerStrategy;
     @Resource
-    private TransactionTemplate executor;
+    private TransactionTemplate transactionTemplate;
     @Resource
     private RedissonService redissonService;
+    @Resource
+    private EventPublisher eventPublisher;
 
 
     @Override
-    public void doUserCreditRecharge(UserCreditRechargeAggregate userCreditRechargeAggregate) {
-        RLock lock = redissonService.getLock(Constants.RedisKey.USER_CREDIT_ACCOUNT_LOCK + userCreditRechargeAggregate.getUserId());
+    public void doSaveUserCreditAdjust(TradeAggregate tradeAggregate) {
+        RLock lock = redissonService.getLock(Constants.RedisKey.USER_CREDIT_ACCOUNT_LOCK + tradeAggregate.getUserId());
         try{
             lock.lock(3, TimeUnit.SECONDS);
-            routerStrategy.doRouter(userCreditRechargeAggregate.getUserId());
-            executor.execute(status -> {
+            routerStrategy.doRouter(tradeAggregate.getUserId());
+            transactionTemplate.execute(status -> {
                 try {
-                    UserCreditAccountEntity userCreditAccountEntity = userCreditRechargeAggregate.getUserCreditAccountEntity();
+                    /**
+                     * 执行积分增减操作
+                     */
+                    // 类型转换
+                    UserCreditAccountEntity userCreditAccountEntity = tradeAggregate.getUserCreditAccountEntity();
                     UserCreditAccount userCreditAccount = UserCreditAccount.builder()
                             .userId(userCreditAccountEntity.getUserId())
                             .totalAmount(userCreditAccountEntity.getTotalAmount())
@@ -57,21 +78,34 @@ public class CreditRepository implements ICreditRepository {
                             .accountStatus(userCreditAccount.getAccountStatus())
                             .build();
                     userCreditAccountReq = userCreditAccountDao.queryUserCreditAccount(userCreditAccountReq);
+                    // 更新积分账户，不存在则创建
                     if (null == userCreditAccountReq) {
                         userCreditAccountDao.insert(userCreditAccount);
                     }else {
                         userCreditAccountDao.updateUserCreditAccount(userCreditAccount);
                     }
-                    UserCreditOrderEntity userCreditOrderEntity = userCreditRechargeAggregate.getUserCreditOrderEntity();
+                    // 类型转换
+                    UserCreditOrderEntity userCreditOrderEntity = tradeAggregate.getUserCreditOrderEntity();
                     UserCreditOrder userCreditOrder = UserCreditOrder.builder()
                             .userId(userCreditOrderEntity.getUserId())
                             .orderId(userCreditOrderEntity.getOrderId())
-                            .tradeName(userCreditOrderEntity.getTradeName())
+                            .tradeName(userCreditOrderEntity.getTradeName().getCode())
                             .tradeType(userCreditOrderEntity.getTradeType().getCode())
                             .tradeAmount(userCreditOrderEntity.getTradeAmount())
                             .outBusinessNo(userCreditOrderEntity.getOutBusinessNo())
                             .build();
                     userCreditOrderDao.insert(userCreditOrder);
+                    // task 类型转换
+                    TaskEntity taskEntity = tradeAggregate.getTaskEntity();
+                    Task task = Task.builder()
+                            .userId(taskEntity.getUserId())
+                            .topic(taskEntity.getTopic())
+                            .messageId(taskEntity.getMessageId())
+                            .message(JSON.toJSONString(taskEntity.getMessage()))
+                            .state(taskEntity.getState().getCode())
+                            .build();
+                    taskDao.insertTask(task);
+                    eventPublisher.publish(task.getTopic(), task.getMessage());
                 }catch (DuplicateKeyException e){
                     log.error("用户行为返利积分充值订单已经存在", e);
                     status.setRollbackOnly();

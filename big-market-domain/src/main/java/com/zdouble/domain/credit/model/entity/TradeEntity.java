@@ -13,11 +13,10 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreditOrderEntity {
+public class TradeEntity {
     private String userId;
-    private String orderId;
-    private TradeNameVO tradeName;
-    private TradeTypeVO tradeType;
-    private BigDecimal tradeAmount;
     private String outBusinessNo;
+    private BigDecimal tradeAmount;
+    private TradeTypeVO tradeType;
+    private TradeNameVO tradeName;
 }

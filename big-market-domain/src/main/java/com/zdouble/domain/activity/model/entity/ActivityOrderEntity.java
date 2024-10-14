@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -23,6 +24,7 @@ public class ActivityOrderEntity {
     private Integer totalCount;
     private Integer dayCount;
     private Integer monthCount;
+    private BigDecimal payAmount;
     private OrderStateVO state;
     private String outBusinessNo;
 }

@@ -1,9 +1,10 @@
 package com.zdouble.domain.activity.repository;
 
-import com.zdouble.domain.activity.model.aggregate.CreateOrderAggregate;
+import com.zdouble.domain.activity.model.aggregate.CreateQuotaOrderAggregate;
 import com.zdouble.domain.activity.model.aggregate.CreatePartakeOrderAggregate;
 import com.zdouble.domain.activity.model.entity.*;
 import com.zdouble.domain.activity.model.pojo.ActivitySkuStockVO;
+import com.zdouble.domain.credit.model.entity.DeliveryOrderEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -14,8 +15,6 @@ public interface IActivityRepository {
     ActivityEntity queryActivityByActivityId(Long activityId);
 
     ActivityCountEntity queryActivityCountByActivityCountId(Long activityCountId);
-
-    void saveOrderAggregate(CreateOrderAggregate createOrderAggregate);
 
     void cacheActivitySkuCount(String cacheKey, Integer stockCont);
 
@@ -48,4 +47,10 @@ public interface IActivityRepository {
     Integer queryRaffleActivityTotalPartakeCount(String userId, Long activityId);
 
     List<ActivitySkuEntity> queryActivitySkuList();
+
+    void doSaveCreditPayOrder(CreateQuotaOrderAggregate createQuotaOrderAggregate);
+
+    void doSaveNoPayOrder(CreateQuotaOrderAggregate createQuotaOrderAggregate);
+
+    void updateOrder(DeliveryOrderEntity deliveryOrderEntity);
 }

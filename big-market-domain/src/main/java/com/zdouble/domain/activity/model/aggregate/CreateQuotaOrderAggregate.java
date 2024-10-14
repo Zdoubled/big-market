@@ -1,7 +1,7 @@
 package com.zdouble.domain.activity.model.aggregate;
 
-import com.zdouble.domain.activity.model.entity.ActivityAccountEntity;
 import com.zdouble.domain.activity.model.entity.ActivityOrderEntity;
+import com.zdouble.domain.activity.model.pojo.OrderStateVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrderAggregate {
+public class CreateQuotaOrderAggregate {
     private String userId;
     private Long activityId;
     private Integer totalCount;
@@ -21,4 +21,8 @@ public class CreateOrderAggregate {
     private Integer monthCount;
     private Integer monthCountSurplus;
     private ActivityOrderEntity activityOrderEntity;
+
+    public void setOrderStateVO(OrderStateVO orderStateVO) {
+        activityOrderEntity.setState(orderStateVO);
+    }
 }

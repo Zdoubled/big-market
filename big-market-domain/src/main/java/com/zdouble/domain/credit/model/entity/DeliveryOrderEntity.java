@@ -9,10 +9,16 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserCreditRechargeEntity {
+@AllArgsConstructor
+public class DeliveryOrderEntity {
+    /**
+     * 用户ID
+     */
     private String userId;
+
+    /**
+     * 业务仿重ID
+     */
     private String outBusinessNo;
-    private BigDecimal creditRecharge;
 }

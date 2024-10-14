@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
 import com.zdouble.domain.activity.service.quota.RaffleActivityAccountQuotaService;
-import com.zdouble.domain.credit.model.entity.UserCreditRechargeEntity;
+import com.zdouble.domain.credit.model.entity.TradeEntity;
+import com.zdouble.domain.credit.model.vo.TradeNameVO;
+import com.zdouble.domain.credit.model.vo.TradeTypeVO;
 import com.zdouble.domain.credit.service.ICreditService;
 import com.zdouble.domain.rebate.event.UserBehaviorRebateMessageEvent;
 import com.zdouble.domain.rebate.model.vo.RebateTypeVO;
@@ -54,10 +56,12 @@ public class UserBehaviorRebateOrderListener {
                 // 处理用户积分返利
                 case integral:
                     BigDecimal creditAdd = new BigDecimal(eventData.getRebateConfig());
-                    String integralOrderId = creditService.createCreditRechargeOrder(UserCreditRechargeEntity.builder()
+                    String integralOrderId = creditService.createCreditAdjustOrder(TradeEntity.builder()
                             .userId(eventData.getUserId())
+                            .tradeType(TradeTypeVO.forward)
+                            .tradeName(TradeNameVO.Rebate)
+                            .tradeAmount(creditAdd)
                             .outBusinessNo(RandomStringUtils.randomNumeric(12))
-                            .creditRecharge(creditAdd)
                             .build()
                     );
                     break;

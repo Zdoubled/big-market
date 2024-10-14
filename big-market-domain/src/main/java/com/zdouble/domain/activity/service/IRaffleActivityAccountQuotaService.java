@@ -2,6 +2,7 @@ package com.zdouble.domain.activity.service;
 
 import com.zdouble.domain.activity.model.entity.ActivityAccountEntity;
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
+import com.zdouble.domain.credit.model.entity.DeliveryOrderEntity;
 
 public interface IRaffleActivityAccountQuotaService {
 
@@ -26,4 +27,10 @@ public interface IRaffleActivityAccountQuotaService {
      * @return
      */
     ActivityAccountEntity queryActivityAccountQuotaService(ActivityAccountEntity activityAccountEntity);
+
+    /**
+     * 修改订单状态
+     * @param deliveryOrderEntity
+     */
+    void updateOrder(DeliveryOrderEntity deliveryOrderEntity);
 }
