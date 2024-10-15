@@ -119,8 +119,6 @@ public class ActivityRepository implements IActivityRepository {
                 .dayCount(raffleActivityCount.getDayCount())
                 .monthCount(raffleActivityCount.getMonthCount())
                 .totalCount(raffleActivityCount.getTotalCount())
-                .createTime(raffleActivityCount.getCreateTime())
-                .updateTime(raffleActivityCount.getUpdateTime())
                 .build();
         redisService.setValue(cacheKey, activityCountEntity);
         return activityCountEntity;
@@ -259,6 +257,21 @@ public class ActivityRepository implements IActivityRepository {
             lock.unlock();
             dbRouterStrategy.clear();
         }
+    }
+
+    @Override
+    public UnpaidActivityOrderEntity queryUnpaidActivityOrder(ActivitySkuChargeEntity activitySkuChargeEntity) {
+        RaffleActivityOrder raffleActivityOrder = new RaffleActivityOrder();
+        raffleActivityOrder.setUserId(activitySkuChargeEntity.getUserId());
+        raffleActivityOrder.setSku(activitySkuChargeEntity.getSku());
+        raffleActivityOrder = raffleActivityOrderDao.queryUnpaidActivityOrder(raffleActivityOrder);
+        if (null == raffleActivityOrder) return null;
+        return UnpaidActivityOrderEntity.builder()
+                .userId(raffleActivityOrder.getUserId())
+                .orderId(raffleActivityOrder.getOrderId())
+                .outBusinessNo(raffleActivityOrder.getOutBusinessNo())
+                .payAmount(raffleActivityOrder.getPayAmount())
+                .build();
     }
 
     @Override

@@ -1,14 +1,18 @@
 package com.zdouble.trigger.http;
 
 import com.zdouble.IRaffleActivityService;
-import com.zdouble.domain.activity.model.entity.ActivityAccountEntity;
-import com.zdouble.domain.activity.model.entity.UserRaffleOrderEntity;
+import com.zdouble.domain.activity.model.entity.*;
+import com.zdouble.domain.activity.model.pojo.OrderTradeTypeVO;
 import com.zdouble.domain.activity.service.IRaffleActivityAccountQuotaService;
 import com.zdouble.domain.activity.service.IRaffleActivityPartakeService;
 import com.zdouble.domain.activity.service.armory.IActivityArmory;
 import com.zdouble.domain.award.model.entity.UserAwardRecordEntity;
 import com.zdouble.domain.award.model.vo.AwardStateVO;
 import com.zdouble.domain.award.service.IAwardService;
+import com.zdouble.domain.credit.model.entity.TradeEntity;
+import com.zdouble.domain.credit.model.vo.TradeNameVO;
+import com.zdouble.domain.credit.model.vo.TradeTypeVO;
+import com.zdouble.domain.credit.service.ICreditService;
 import com.zdouble.domain.rebate.IBehaviorRebateService;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity;
@@ -24,10 +28,12 @@ import com.zdouble.types.enums.ResponseCode;
 import com.zdouble.types.exception.AppException;
 import com.zdouble.types.model.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +60,8 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     private IBehaviorRebateService behaviorRebateService;
     @Resource
     private IRaffleActivityAccountQuotaService raffleActivityAccountQuotaService;
+    @Resource
+    private ICreditService creditService;
     @Resource
     private IRaffleRule raffleRule;
 
@@ -143,7 +151,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                         .data(Boolean.FALSE)
                         .build();
             }
-            // 2. 调用签到返利服务
+            // 2. 调用签到返利服务 orderId是行为返利奖品发放的订单id
             List<String> orderIds = behaviorRebateService.createOrder(UserBehaviorEntity.builder()
                     .userId(userId)
                     .behaviorType(BehaviorTypeVO.sign)
@@ -289,6 +297,116 @@ public class RaffleControllerActivity implements IRaffleActivityService {
         }catch (Exception e){
             log.error("权重配置失败 userId：{}", dto.getUserId());
             return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @Override
+    public Response<Boolean> creditPayExchangeSku(SkuProductShopCartRequestDTO dto) {
+        try {
+            // 参数校验
+            if (null == dto || StringUtils.isBlank(dto.getUserId()) || null == dto.getSku()) {
+                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
+            }
+            // 根据userId 和 sku  查询数据库是否有未支付的订单id
+            ActivitySkuChargeEntity activitySkuChargeEntity = ActivitySkuChargeEntity.builder()
+                    .sku(dto.getSku())
+                    .userId(dto.getUserId())
+                    .outBusinessNo(RandomStringUtils.randomNumeric(14))
+                    .orderTradeType(OrderTradeTypeVO.CreditPayPolicy)
+                    .build();
+            UnpaidActivityOrderEntity unpaidActivityOrderEntity = raffleActivityAccountQuotaService.createSkuRechargeOrder(activitySkuChargeEntity);
+            TradeEntity tradeEntity = TradeEntity.builder()
+                    .userId(unpaidActivityOrderEntity.getUserId())
+                    .outBusinessNo(unpaidActivityOrderEntity.getOutBusinessNo())
+                    .tradeType(TradeTypeVO.reverse)
+                    .tradeAmount(BigDecimal.ZERO.subtract(unpaidActivityOrderEntity.getPayAmount()))
+                    .tradeName(TradeNameVO.Adjust)
+                    .build();
+            // 调用积分支付接口进行支付
+            String creditAdjustOrder = creditService.createCreditAdjustOrder(tradeEntity);
+            log.info("creditAdjustOrder：{}", creditAdjustOrder);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(Boolean.TRUE)
+                    .build();
+        }catch (AppException e){
+            log.error("积分兑换失败 userId：{}", dto.getUserId());
+            return Response.<Boolean>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            log.error("积分兑换失败 userId：{}", dto.getUserId());
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @Override
+    public Response<List<SkuProductResponseDto>> querySkuProductListByActivityId(Long activityId) {
+        try{
+            // 参数校验
+            if(null == activityId){
+                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
+            }
+            // 根据activityId查询sku
+            List<SkuProductEntity> skuProductEntities = raffleActivityAccountQuotaService.querySkuProductEntitiesByActivityId(activityId);
+            List<SkuProductResponseDto> skuProductResponseDtoList = skuProductEntities.stream().map(skuProductEntity -> {
+                return SkuProductResponseDto.builder()
+                        .sku(skuProductEntity.getSku())
+                        .activityCountId(skuProductEntity.getActivityCountId())
+                        .productAmount(skuProductEntity.getProductAmount())
+                        .stockCount(skuProductEntity.getStockCount())
+                        .stockCountSurplus(skuProductEntity.getStockCountSurplus())
+                        .totalCount(skuProductEntity.getActivityCount().getTotalCount())
+                        .monthCount(skuProductEntity.getActivityCount().getMonthCount())
+                        .dayCount(skuProductEntity.getActivityCount().getDayCount())
+                        .build();
+            }).collect(Collectors.toList());
+            return Response.<List<SkuProductResponseDto>>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(skuProductResponseDtoList)
+                    .build();
+        }catch (AppException e){
+            log.error("查询活动sku失败 activityId：{}", activityId);
+            return Response.<List<SkuProductResponseDto>>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            log.error("查询活动sku失败 activityId：{}", activityId);
+            return Response.<List<SkuProductResponseDto>>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @Override
+    public Response<BigDecimal> queryUserCreditAccount(String userId) {
+        try{
+            BigDecimal creditAccount = creditService.queryCreditAvailableByUserId(userId);
+            return Response.<BigDecimal>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(creditAccount)
+                    .build();
+        }catch (AppException e){
+            log.error("查询用户积分账户失败 userId：{}", userId);
+            return Response.<BigDecimal>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        }catch (Exception e){
+            log.error("查询用户积分账户失败 userId：{}", userId);
+            return Response.<BigDecimal>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())
                     .build();

@@ -30,7 +30,6 @@ public abstract class AbstractBehaviorRebateService implements IBehaviorRebateSe
     public List<String> createOrder(UserBehaviorEntity userBehavior) {
         // 1. 查询数据库，获取用户返利行为实体
         List<DailyBehaviorRebateEntity> dailyBehaviorRebates = behaviorRebateRepository.queryDailyBehaviorRebateByBehaviorType(userBehavior.getBehaviorType().getCode());
-        // TODO 此处得进行过滤, 如 : 用户今天是否获得登录行为返利
         // 2. 创建订单对象
         List<UserBehaviorRebateOrderEntity> userBehaviorRebateOrders = createUserBehaviorRebateOrder(userBehavior.getUserId(), dailyBehaviorRebates);
         // 3. 订单聚合对象

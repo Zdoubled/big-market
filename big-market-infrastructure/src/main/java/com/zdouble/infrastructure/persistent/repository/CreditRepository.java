@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -119,5 +120,10 @@ public class CreditRepository implements ICreditRepository {
             lock.unlock();
             routerStrategy.clear();
         }
+    }
+
+    @Override
+    public BigDecimal queryCreditAvailableByUserId(String userId) {
+        return userCreditAccountDao.queryCreditAvailableByUserId(userId);
     }
 }

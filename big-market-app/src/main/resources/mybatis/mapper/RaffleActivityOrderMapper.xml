@@ -36,5 +36,9 @@
     <select id="queryRaffleActivityOrder" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityOrder" resultMap="resultMap">
         select * from raffle_activity_order where user_id = #{userId} and out_business_no = #{outBusinessNo}
     </select>
+    <select id="queryUnpaidActivityOrder" parameterType="com.zdouble.infrastructure.persistent.po.RaffleActivityOrder" resultMap="resultMap">
+        select * from raffle_activity_order
+        where user_id = #{userId} and sku = #{sku} and state = 'wait_pay' and create_time > now() - interval 1 month
+    </select>
 
 </mapper>

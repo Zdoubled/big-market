@@ -22,7 +22,7 @@ public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivityS
     }
 
     @Override
-    public String createSkuRechargeOrder(ActivitySkuChargeEntity activitySkuChargeEntity) {
+    public UnpaidActivityOrderEntity createSkuRechargeOrder(ActivitySkuChargeEntity activitySkuChargeEntity) {
         // 1. 参数校验
         Long sku = activitySkuChargeEntity.getSku();
         String userId = activitySkuChargeEntity.getUserId();
@@ -30,6 +30,9 @@ public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivityS
         if (null == sku || StringUtils.isBlank(userId) || StringUtils.isBlank(outBusinessNo)) {
             throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
         }
+        // 查询数据库是否有为支付的订单（一个月以内）
+        UnpaidActivityOrderEntity unpaidActivityOrderEntity = activityRepository.queryUnpaidActivityOrder(activitySkuChargeEntity);
+        if (null != unpaidActivityOrderEntity) return unpaidActivityOrderEntity;
         // 2. 查询数据库
         ActivitySkuEntity activitySkuEntity = queryActivitySku(sku);
         ActivityEntity activityEntity = queryActivityByActivityId(activitySkuEntity.getActivityId());
@@ -44,10 +47,16 @@ public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivityS
         if (null == tradePolicy) {
             throw new AppException(ResponseCode.DATA_NOT_EXIST.getCode(), "活动交易规则不存在");
         }
-        // 交易执行
+        // 6. 交易执行
         tradePolicy.trade(createQuotaOrderAggregate);
-        // 6. 返回结果
-        return createQuotaOrderAggregate.getActivityOrderEntity().getOrderId();
+        // 7. 返回未支付订单
+        ActivityOrderEntity activityOrderEntity = createQuotaOrderAggregate.getActivityOrderEntity();
+        return UnpaidActivityOrderEntity.builder()
+                .userId(userId)
+                .orderId(activityOrderEntity.getOrderId())
+                .outBusinessNo(activityOrderEntity.getOutBusinessNo())
+                .payAmount(activityOrderEntity.getPayAmount())
+                .build();
     }
 
     protected abstract CreateQuotaOrderAggregate buildOrderAggregate(ActivitySkuEntity activitySkuEntity, ActivityEntity activityEntity, ActivityCountEntity activityCountEntity, ActivitySkuChargeEntity activitySkuChargeEntity);

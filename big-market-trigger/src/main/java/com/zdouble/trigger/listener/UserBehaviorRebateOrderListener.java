@@ -46,7 +46,7 @@ public class UserBehaviorRebateOrderListener {
                 // 处理库存返利
                 case sku:
                     Long sku = Long.valueOf(eventData.getRebateConfig());
-                    String skuOrderId = raffleActivityAccountQuotaService.createSkuRechargeOrder(ActivitySkuChargeEntity.builder()
+                        raffleActivityAccountQuotaService.createSkuRechargeOrder(ActivitySkuChargeEntity.builder()
                             .userId(eventData.getUserId())
                             .outBusinessNo(RandomStringUtils.randomNumeric(12))
                             .sku(sku)

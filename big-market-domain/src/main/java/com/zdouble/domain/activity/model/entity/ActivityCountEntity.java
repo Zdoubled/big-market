@@ -16,6 +16,4 @@ public class ActivityCountEntity {
     private Integer totalCount;
     private Integer dayCount;
     private Integer monthCount;
-    private Date createTime;
-    private Date updateTime;
 }

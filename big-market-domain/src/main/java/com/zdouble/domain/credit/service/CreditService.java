@@ -88,4 +88,9 @@ public class CreditService implements ICreditService {
         // 保存返回订单id
         return userCreditOrderEntity.getOrderId();
     }
+
+    @Override
+    public BigDecimal queryCreditAvailableByUserId(String userId) {
+        return creditRepository.queryCreditAvailableByUserId(userId);
+    }
 }

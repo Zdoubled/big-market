@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -95,5 +96,24 @@ public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAcc
     @Override
     public void updateOrder(DeliveryOrderEntity deliveryOrderEntity) {
         activityRepository.updateOrder(deliveryOrderEntity);
+    }
+
+    @Override
+    public List<SkuProductEntity> querySkuProductEntitiesByActivityId(Long activityId) {
+        List<ActivitySkuEntity> activitySkuEntities = activityRepository.queryActivitySkuByActivityId(activityId);
+
+        if (activitySkuEntities == null || activitySkuEntities.isEmpty()) return null;
+        return activitySkuEntities.stream().map(activitySkuEntity -> {
+            ActivityCountEntity activityCountEntity = activityRepository.queryActivityCountByActivityCountId(activitySkuEntity.getActivityCountId());
+            return SkuProductEntity.builder()
+                    .sku(activitySkuEntity.getSku())
+                    .activityId(activitySkuEntity.getActivityId())
+                    .activityCountId(activitySkuEntity.getActivityCountId())
+                    .stockCount(activitySkuEntity.getStockCount())
+                    .stockCountSurplus(activitySkuEntity.getStockCount())
+                    .productAmount(activitySkuEntity.getProductAmount())
+                    .activityCount(activityCountEntity)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

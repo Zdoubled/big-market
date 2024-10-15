@@ -39,8 +39,7 @@ public class ActivitySkuCountSubtractionTest {
                         .userId("xiaofuge")
                         .outBusinessNo(RandomStringUtils.randomNumeric(12))
                         .build();
-                String orderId = raffleOrder.createSkuRechargeOrder(charge);
-                log.info("订单id：{}", orderId);
+                raffleOrder.createSkuRechargeOrder(charge);
             }catch (AppException e){
                 log.warn("订单创建异常：{}", e.getMessage());
             }

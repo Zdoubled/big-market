@@ -3,6 +3,7 @@ package com.zdouble;
 import com.zdouble.dto.*;
 import com.zdouble.types.model.Response;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface IRaffleActivityService {
@@ -48,4 +49,25 @@ public interface IRaffleActivityService {
      * @return
      */
     Response<List<RaffleStrategyRuleWeightResponseDto>> queryRaffleStrategyRuleWeight(RaffleStrategyRuleWeightRequestDto dto);
+
+    /**
+     * 积分兑换接口
+     * @param dto
+     * @return
+     */
+    Response<Boolean> creditPayExchangeSku(SkuProductShopCartRequestDTO dto);
+
+    /**
+     * 查询活动所有可兑换sku
+     * @param activityId
+     * @return
+     */
+    Response<List<SkuProductResponseDto>> querySkuProductListByActivityId(Long activityId);
+
+    /**
+     * 查询用户积分账户可用积分
+     * @param userId
+     * @return
+     */
+    Response<BigDecimal> queryUserCreditAccount(String userId);
 }
