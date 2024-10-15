@@ -41,6 +41,8 @@ public class Constants {
          * redis锁
          */
         public static final String ACTIVITY_ACCOUNT_SURPLUS_COUNT_LOCK = "big_market_activity_account_surplus_count_lock";
+        public static final String USER_CREDIT_ACCOUNT_LOCK = "big_market_user_credit_account_lock";
+        public static final String RAFFLE_ACTIVITY_ACCOUNT_LOCK = "big_market_raffle_activity_account_lock";
 
     }
 }

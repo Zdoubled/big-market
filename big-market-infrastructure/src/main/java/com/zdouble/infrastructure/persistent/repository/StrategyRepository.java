@@ -47,6 +47,8 @@ public class StrategyRepository implements IStrategyRepository {
     @Resource
     private RaffleActivityDao raffleActivityDao;
     @Resource
+    private RaffleActivityAccountDao raffleActivityAccountDao;
+    @Resource
     private RaffleActivityAccountDayDao raffleActivityAccountDayDao;
 
     @Override
@@ -328,4 +330,16 @@ public class StrategyRepository implements IStrategyRepository {
         }
         return resultMap;
     }
+
+    @Override
+    public Integer queryActivityAccountTotalUseCount(String userId, Long strategyId) {
+        Long activityId = raffleActivityDao.queryActivityIdByStrategyId(strategyId);
+        RaffleActivityAccount raffleActivityAccount = raffleActivityAccountDao.queryActivityAccount(RaffleActivityAccount.builder()
+                .userId(userId)
+                .activityId(activityId)
+                .build());
+        // 返回计算使用量
+        return raffleActivityAccount.getTotalCount() - raffleActivityAccount.getTotalCountSurplus();
+    }
+
 }

@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,6 +14,4 @@ public class ActivityCountEntity {
     private Integer totalCount;
     private Integer dayCount;
     private Integer monthCount;
-    private Date createTime;
-    private Date updateTime;
 }

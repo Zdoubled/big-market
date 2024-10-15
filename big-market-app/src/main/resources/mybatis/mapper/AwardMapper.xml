@@ -17,4 +17,7 @@
         from award
         limit 10
     </select>
+    <select id="queryAwardKey" resultType="java.lang.String">
+        select award_key from award where award_id = #{awardId}
+    </select>
 </mapper>

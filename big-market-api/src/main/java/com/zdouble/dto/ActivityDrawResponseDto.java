@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ActivityDrawResponseDto {
     private Integer awardId;
+    private String orderId;
+    private String awardConfig;
     private Integer awardIndex;
     private String awardTitle;
 }

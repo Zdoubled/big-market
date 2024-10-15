@@ -23,6 +23,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,6 +80,7 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
                             .userId(userBehaviorRebateOrderEntity.getUserId())
                             .orderId(userBehaviorRebateOrderEntity.getOrderId())
                             .bizId(userBehaviorRebateOrderEntity.getBizId())
+                            .outBusinessNo(userBehaviorRebateOrderEntity.getOutBusinessNo())
                             .behaviorType(userBehaviorRebateOrderEntity.getBehaviorType().getCode())
                             .rebateConfig(userBehaviorRebateOrderEntity.getRebateConfig())
                             .rebateType(userBehaviorRebateOrderEntity.getRebateType().getCode())
@@ -108,5 +111,27 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
                 taskDao.updateTaskStateFail(task);
             }
         }
+    }
+
+    @Override
+    public List<UserBehaviorRebateOrderEntity> queryUserBehaviorRebateOrder(UserBehaviorRebateOrderEntity userBehaviorRebateOrderEntity) {
+        UserBehaviorRebateOrder userBehaviorRebateOrder = UserBehaviorRebateOrder.builder()
+                .userId(userBehaviorRebateOrderEntity.getUserId())
+                .behaviorType(userBehaviorRebateOrderEntity.getBehaviorType().getCode())
+                .outBusinessNo(userBehaviorRebateOrderEntity.getOutBusinessNo())
+                .build();
+        List<UserBehaviorRebateOrder> userBehaviorRebateOrders = userBehaviorRebateOrderDao.queryUserBehaviorRebateOrder(userBehaviorRebateOrderEntity);
+        return userBehaviorRebateOrders.stream().map(rebateOrder -> {
+            return UserBehaviorRebateOrderEntity.builder()
+                    .userId(rebateOrder.getUserId())
+                    .orderId(rebateOrder.getOrderId())
+                    .behaviorType(BehaviorTypeVO.valueOf(rebateOrder.getBehaviorType()))
+                    .rebateConfig(rebateOrder.getRebateConfig())
+                    .rebateDesc(rebateOrder.getRebateDesc())
+                    .rebateType(RebateTypeVO.valueOf(rebateOrder.getRebateType()))
+                    .outBusinessNo(rebateOrder.getOutBusinessNo())
+                    .bizId(rebateOrder.getBizId())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

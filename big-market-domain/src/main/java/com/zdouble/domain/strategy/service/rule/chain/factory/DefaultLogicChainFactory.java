@@ -47,6 +47,7 @@ public class DefaultLogicChainFactory {
     @AllArgsConstructor
     public static class StrategyAwardVO {
         private Integer awardId;
+        private String awardRuleValue;
         private String logicModel;
     }
 

@@ -31,4 +31,8 @@ public class DailyBehaviorRebateEntity {
     public String getBizId(String userId) {
         return userId + "_" + rebateType + "_" + sdf.format(new Date());
     }
+
+    public String generateOutBusinessNo() {
+        return sdf.format(new Date());
+    }
 }

@@ -7,10 +7,7 @@ import com.zdouble.domain.rebate.model.entity.DailyBehaviorRebateEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity;
 import com.zdouble.domain.rebate.repository.IBehaviorRebateRepository;
-import com.zdouble.types.enums.ResponseCode;
-import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +27,6 @@ public abstract class AbstractBehaviorRebateService implements IBehaviorRebateSe
     public List<String> createOrder(UserBehaviorEntity userBehavior) {
         // 1. 查询数据库，获取用户返利行为实体
         List<DailyBehaviorRebateEntity> dailyBehaviorRebates = behaviorRebateRepository.queryDailyBehaviorRebateByBehaviorType(userBehavior.getBehaviorType().getCode());
-        // TODO 此处得进行过滤, 如 : 用户今天是否获得登录行为返利
         // 2. 创建订单对象
         List<UserBehaviorRebateOrderEntity> userBehaviorRebateOrders = createUserBehaviorRebateOrder(userBehavior.getUserId(), dailyBehaviorRebates);
         // 3. 订单聚合对象

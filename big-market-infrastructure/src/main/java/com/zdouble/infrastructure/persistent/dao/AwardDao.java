@@ -8,4 +8,6 @@ import java.util.List;
 @Mapper
 public interface AwardDao {
     public List<Award> queryAwardList();
+
+    String queryAwardKey(Integer awardId);
 }

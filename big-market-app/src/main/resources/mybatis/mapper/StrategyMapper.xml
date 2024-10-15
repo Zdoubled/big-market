@@ -5,7 +5,7 @@
     <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.Strategy">
         <id column="id" property="id"/>
         <result column="strategy_id" property="strategyId"/>
-        <result column="rule_model" property="ruleModel"/>
+        <result column="rule_models" property="ruleModel"/>
         <result column="strategy_desc" property="strategyDesc"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>

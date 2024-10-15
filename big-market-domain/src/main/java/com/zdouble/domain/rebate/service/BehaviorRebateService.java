@@ -5,6 +5,7 @@ import com.zdouble.domain.rebate.model.aggregate.UserBehaviorRebateAggregate;
 import com.zdouble.domain.rebate.model.entity.DailyBehaviorRebateEntity;
 import com.zdouble.domain.rebate.model.entity.TaskEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity;
+import com.zdouble.domain.rebate.model.vo.BehaviorTypeVO;
 import com.zdouble.domain.rebate.model.vo.RebateTypeVO;
 import com.zdouble.domain.rebate.model.vo.TaskStateVO;
 import com.zdouble.domain.rebate.repository.IBehaviorRebateRepository;
@@ -36,6 +37,7 @@ public class BehaviorRebateService extends AbstractBehaviorRebateService {
         return dailyBehaviorRebates.stream().map(dailyBehaviorRebateEntity -> {
             return UserBehaviorRebateOrderEntity.builder()
                     .behaviorType(dailyBehaviorRebateEntity.getBehaviorType())
+                    .outBusinessNo(dailyBehaviorRebateEntity.generateOutBusinessNo())
                     .bizId(dailyBehaviorRebateEntity.getBizId(userId))
                     .rebateConfig(dailyBehaviorRebateEntity.getRebateConfig())
                     .rebateType(dailyBehaviorRebateEntity.getRebateType())
@@ -72,5 +74,15 @@ public class BehaviorRebateService extends AbstractBehaviorRebateService {
                     .userBehaviorRebateOrder(userBehaviorRebateOrder)
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserBehaviorRebateOrderEntity> isCalendarSignRebate(String userId, String outBusinessNo) {
+        UserBehaviorRebateOrderEntity userBehaviorRebateOrderEntity = UserBehaviorRebateOrderEntity.builder()
+                .userId(userId)
+                .outBusinessNo(outBusinessNo)
+                .behaviorType(BehaviorTypeVO.sign)
+                .build();
+        return behaviorRebateRepository.queryUserBehaviorRebateOrder(userBehaviorRebateOrderEntity);
     }
 }

@@ -3,6 +3,7 @@ package com.zdouble.trigger.listener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.zdouble.domain.award.event.UserAwardSendMessageEvent;
+import com.zdouble.domain.award.model.entity.DistributeAwardEntity;
 import com.zdouble.domain.award.service.IAwardService;
 import com.zdouble.types.event.BaseEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,16 @@ public class UserAwardSendListener {
     @RabbitListener(queuesToDeclare = @Queue(value = "${spring.rabbitmq.topic.award_send}"))
     public void onMessage(String message) {
         try {
-            // 调用奖品下发接口，实现奖品的发放
-            UserAwardSendMessageEvent.SendAwardMessage sendAwardMessage = JSON.parseObject(message, new TypeReference<UserAwardSendMessageEvent.SendAwardMessage>() {
-            });
-            // awardService.sendAward(sendAwardMessage);
-            log.info("奖品下发成功, {}", sendAwardMessage);
+            BaseEvent.EventMessage<UserAwardSendMessageEvent.SendAwardMessage> eventMessage = JSON.parseObject(message, new TypeReference<BaseEvent.EventMessage<UserAwardSendMessageEvent.SendAwardMessage>>() {
+            }.getType());
+            UserAwardSendMessageEvent.SendAwardMessage sendAwardMessage = eventMessage.getData();
+            DistributeAwardEntity distributeAwardEntity = DistributeAwardEntity.builder()
+                    .userId(sendAwardMessage.getUserId())
+                    .awardId(sendAwardMessage.getAwardId())
+                    .orderId(sendAwardMessage.getOrderId())
+                    .awardConfig(sendAwardMessage.getAwardConfig())
+                    .build();
+            awardService.giveOutPrizes(distributeAwardEntity);
         } catch (Exception e) {
             log.error("奖品下发异常", e);
         }

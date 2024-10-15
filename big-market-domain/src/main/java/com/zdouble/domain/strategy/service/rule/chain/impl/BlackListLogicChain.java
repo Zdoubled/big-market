@@ -28,6 +28,7 @@ public class BlackListLogicChain extends AbstractLogicChain {
             if(userId.equals(black)){
                 return DefaultLogicChainFactory.StrategyAwardVO.builder()
                         .awardId(Integer.parseInt(ruleValues[0]))
+                        .awardRuleValue("0.01,1")
                         .logicModel(ruleModel())
                         .build();
             }
