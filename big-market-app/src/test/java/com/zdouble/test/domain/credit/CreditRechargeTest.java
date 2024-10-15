@@ -2,7 +2,6 @@ package com.zdouble.test.domain.credit;
 
 import com.zdouble.domain.activity.model.entity.ActivitySkuChargeEntity;
 import com.zdouble.domain.activity.model.pojo.OrderTradeTypeVO;
-import com.zdouble.domain.activity.service.armory.IActivityArmory;
 import com.zdouble.domain.activity.service.quota.RaffleActivityAccountQuotaService;
 import com.zdouble.domain.credit.model.entity.TradeEntity;
 import com.zdouble.domain.credit.model.vo.TradeNameVO;

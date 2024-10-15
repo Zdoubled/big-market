@@ -26,8 +26,6 @@ public class ApiTest {
 
     @Resource
     private IRaffleActivityService raffleActivityService;
-    @Resource
-    private IActivityArmory activityArmory;
 
     @Test
     public void test_blacklist_draw() throws InterruptedException {

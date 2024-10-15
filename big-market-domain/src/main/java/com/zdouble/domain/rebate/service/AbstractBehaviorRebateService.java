@@ -7,10 +7,7 @@ import com.zdouble.domain.rebate.model.entity.DailyBehaviorRebateEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorEntity;
 import com.zdouble.domain.rebate.model.entity.UserBehaviorRebateOrderEntity;
 import com.zdouble.domain.rebate.repository.IBehaviorRebateRepository;
-import com.zdouble.types.enums.ResponseCode;
-import com.zdouble.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
