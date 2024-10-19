@@ -62,9 +62,6 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     private IRaffleActivityAccountQuotaService raffleActivityAccountQuotaService;
     @Resource
     private ICreditService creditService;
-    @Resource
-    private IRaffleRule raffleRule;
-
 
     @Override
     @RequestMapping(value = "armory", method = RequestMethod.GET)
@@ -89,6 +86,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     public Response<ActivityDrawResponseDto> draw(@RequestBody ActivityDrawRequestDto activityDrawRequestDto) {
         // 1. 参数校验
         try {
+            log.info("活动抽奖开始 userId：{}, activityId：{}", activityDrawRequestDto.getUserId(), activityDrawRequestDto.getActivityId());
             Long activityId = activityDrawRequestDto.getActivityId();
             String userId = activityDrawRequestDto.getUserId();
             if (null == activityId || StringUtils.isBlank(userId)) {
@@ -96,13 +94,17 @@ public class RaffleControllerActivity implements IRaffleActivityService {
             }
             // 2. 参加抽奖
             UserRaffleOrderEntity userRaffleOrder = raffleActivityPartakeService.createOrder(userId, activityId);
+            log.info("参与抽奖，创建抽奖订单:UserRaffleOrder：{}",userRaffleOrder.toString());
             // 3. 执行抽奖
+            log.info("执行抽奖 userId：{}, activityId：{}", userId, activityId);
             RaffleAwardEntity raffleAwardEntity = raffleStrategy.performRaffle(RaffleFactorEntity.builder()
                             .strategyId(userRaffleOrder.getStrategyId())
                             .userId(userRaffleOrder.getUserId())
                             .strategyId(userRaffleOrder.getStrategyId())
                             .endTime(userRaffleOrder.getEndTime())
                         .build());
+            log.info("执行抽奖结果:RaffleAwardEntity：{}",raffleAwardEntity.toString());
+            log.info("开始存放中奖结果");
             // 4. 存放中奖记录结果
             UserAwardRecordEntity userAwardRecordEntity = UserAwardRecordEntity.builder()
                             .activityId(activityId)
@@ -116,6 +118,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                             .strategyId(userRaffleOrder.getStrategyId())
                         .build();
             awardService.saveUserAwardRecord(userAwardRecordEntity);
+            log.info("存放中奖记录结果:UserAwardRecordEntity：{}",userAwardRecordEntity.toString());
             // 5. 返回抽奖结果
             return Response.success(ActivityDrawResponseDto.builder()
                     .awardId(raffleAwardEntity.getAwardId())
@@ -142,6 +145,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     @Override
     @RequestMapping(value = "calendar_sign_rebate", method = RequestMethod.POST)
     public Response<Boolean> calendarSignRebate(@RequestParam String userId) {
+        log.info("开始签到 userId：{}", userId);
         // 1. 参数校验
         try {
             if (StringUtils.isBlank(userId)) {
@@ -152,12 +156,13 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                         .build();
             }
             // 2. 调用签到返利服务 orderId是行为返利奖品发放的订单id
+            log.info("调用签到返利服务 userId：{}", userId);
             List<String> orderIds = behaviorRebateService.createOrder(UserBehaviorEntity.builder()
                     .userId(userId)
                     .behaviorType(BehaviorTypeVO.sign)
                     .build()
             );
-            orderIds.forEach(log::info);
+            log.info("签到返利服务调用成功 orderIds：{}", orderIds.toString());
             // 3. 返回结果
             return Response.<Boolean>builder()
                     .code(ResponseCode.SUCCESS.getCode())
@@ -184,6 +189,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     @Override
     @RequestMapping(value = "is_calendar_sign_rebate", method = RequestMethod.POST)
     public Response<Boolean> isCalendarSignRebate(@RequestParam String userId) {
+        log.info("开始查询用户是否已经签到, userId：{}", userId);
         try {
             // 1. 参数校验
             if (StringUtils.isBlank(userId)) {
@@ -193,6 +199,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             String outBusinessNo = sdf.format(new Date());
             List<UserBehaviorRebateOrderEntity> rebateOrders = behaviorRebateService.isCalendarSignRebate(userId, outBusinessNo);
+            log.info("结束查询用户是否已经签到,结果为:{}", !rebateOrders.isEmpty());
             return Response.<Boolean>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
@@ -214,6 +221,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     @Override
     @RequestMapping(value = "query_user_activity_account", method = RequestMethod.POST)
     public Response<ActivityAccountQuotaResponseDto> userAccountQuota(@RequestBody ActivityAccountQuotaRequestDto activityAccountQuotaRequestDto) {
+        log.info("开始查询活动用户额度账户,activityId：{},userId：{}", activityAccountQuotaRequestDto.getActivityId(), activityAccountQuotaRequestDto.getUserId());
         // 1. 参数校验
         try {
             if (null == activityAccountQuotaRequestDto) {
@@ -224,7 +232,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                     .activityId(activityAccountQuotaRequestDto.getActivityId())
                     .build();
             activityAccountEntity = raffleActivityAccountQuotaService.queryActivityAccountQuotaService(activityAccountEntity);
-
+            log.info("结束查询活动用户额度账户,结果为：{}", activityAccountEntity.toString());
             return Response.<ActivityAccountQuotaResponseDto>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
@@ -253,64 +261,15 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     }
 
     @Override
-    @RequestMapping(value = "query_raffle_strategy_rule_weight", method = RequestMethod.POST)
-    public Response<List<RaffleStrategyRuleWeightResponseDto>> queryRaffleStrategyRuleWeight(@RequestBody RaffleStrategyRuleWeightRequestDto dto) {
-        try {
-            // 1. 参数校验
-            if (null == dto || StringUtils.isBlank(dto.getUserId()) || null == dto.getActivityId()) {
-                throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
-            }
-            // 2. 查询权重规则配置
-            List<RuleWeightVO> ruleWeightVOS = raffleRule.queryAwardRuleWeightByArticleId(dto.getActivityId());
-            // 3. 查询用户总抽奖次数
-            Integer count = raffleActivityAccountQuotaService.queryRaffleActivityTotalPartakeCount(dto.getUserId(), dto.getActivityId());
-
-            // 4. 装配结果
-            ArrayList<RaffleStrategyRuleWeightResponseDto> responseDtos = new ArrayList<>();
-            for (RuleWeightVO ruleWeightVO : ruleWeightVOS) {
-                List<RuleWeightVO.Award> awardList = ruleWeightVO.getAwardList();
-                List<RaffleStrategyRuleWeightResponseDto.AwardVO> awardVOS = awardList.stream().map(award -> {
-                    return RaffleStrategyRuleWeightResponseDto.AwardVO.builder()
-                            .awardId(award.getAwardId())
-                            .awardTitle(award.getAwardTitle())
-                            .build();
-                }).collect(Collectors.toList());
-                responseDtos.add(RaffleStrategyRuleWeightResponseDto.builder()
-                        .ruleWeightCount(ruleWeightVO.getWight())
-                        .userActivityAccountTotalUseCount(count)
-                        .awardVOS(awardVOS)
-                        .build()
-                );
-            }
-
-            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
-                    .code(ResponseCode.SUCCESS.getCode())
-                    .info(ResponseCode.SUCCESS.getInfo())
-                    .data(responseDtos)
-                    .build();
-        }catch (AppException e){
-            log.error("权重配置失败 userId：{}", dto.getUserId());
-            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
-                    .code(e.getCode())
-                    .info(e.getInfo())
-                    .build();
-        }catch (Exception e){
-            log.error("权重配置失败 userId：{}", dto.getUserId());
-            return Response.<List<RaffleStrategyRuleWeightResponseDto>>builder()
-                    .code(ResponseCode.UN_ERROR.getCode())
-                    .info(ResponseCode.UN_ERROR.getInfo())
-                    .build();
-        }
-    }
-
-    @Override
-    public Response<Boolean> creditPayExchangeSku(SkuProductShopCartRequestDTO dto) {
+    @PostMapping("credit_pay_exchange_sku")
+    public Response<Boolean> creditPayExchangeSku(@RequestBody SkuProductShopCartRequestDTO dto) {
+        log.info("开始执行积分兑换商品服务，dto：{}", dto.toString());
         try {
             // 参数校验
             if (null == dto || StringUtils.isBlank(dto.getUserId()) || null == dto.getSku()) {
                 throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
             }
-            // 根据userId 和 sku  查询数据库是否有未支付的订单id
+            // 根据userId 和 sku  查询数据库是否有未支付的订单id 存在：直接返回旧的订单  不存在：创建新的订单e'e
             ActivitySkuChargeEntity activitySkuChargeEntity = ActivitySkuChargeEntity.builder()
                     .sku(dto.getSku())
                     .userId(dto.getUserId())
@@ -327,7 +286,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                     .build();
             // 调用积分支付接口进行支付
             String creditAdjustOrder = creditService.createCreditAdjustOrder(tradeEntity);
-            log.info("creditAdjustOrder：{}", creditAdjustOrder);
+            log.info("结束执行积分兑换商品服务，返回结果：{}", creditAdjustOrder);
             return Response.<Boolean>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
@@ -349,7 +308,9 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     }
 
     @Override
-    public Response<List<SkuProductResponseDto>> querySkuProductListByActivityId(Long activityId) {
+    @PostMapping("query_sku_product_list_by_activity_id")
+    public Response<List<SkuProductResponseDto>> querySkuProductListByActivityId(@RequestParam Long activityId) {
+        log.info("开始执行查询活动sku列表服务，activityId：{}", activityId);
         try{
             // 参数校验
             if(null == activityId){
@@ -358,17 +319,22 @@ public class RaffleControllerActivity implements IRaffleActivityService {
             // 根据activityId查询sku
             List<SkuProductEntity> skuProductEntities = raffleActivityAccountQuotaService.querySkuProductEntitiesByActivityId(activityId);
             List<SkuProductResponseDto> skuProductResponseDtoList = skuProductEntities.stream().map(skuProductEntity -> {
-                return SkuProductResponseDto.builder()
-                        .sku(skuProductEntity.getSku())
-                        .activityCountId(skuProductEntity.getActivityCountId())
-                        .productAmount(skuProductEntity.getProductAmount())
-                        .stockCount(skuProductEntity.getStockCount())
-                        .stockCountSurplus(skuProductEntity.getStockCountSurplus())
+                SkuProductResponseDto.ActivityCount activityCount = SkuProductResponseDto.ActivityCount.builder()
                         .totalCount(skuProductEntity.getActivityCount().getTotalCount())
                         .monthCount(skuProductEntity.getActivityCount().getMonthCount())
                         .dayCount(skuProductEntity.getActivityCount().getDayCount())
                         .build();
+                return SkuProductResponseDto.builder()
+                        .sku(skuProductEntity.getSku())
+                        .activityId(skuProductEntity.getActivityId())
+                        .activityCountId(skuProductEntity.getActivityCountId())
+                        .productAmount(skuProductEntity.getProductAmount())
+                        .stockCount(skuProductEntity.getStockCount())
+                        .stockCountSurplus(skuProductEntity.getStockCountSurplus())
+                        .activityCount(activityCount)
+                        .build();
             }).collect(Collectors.toList());
+            log.info("结束执行查询活动sku列表服务，返回结果：{}", skuProductResponseDtoList);
             return Response.<List<SkuProductResponseDto>>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
@@ -390,9 +356,12 @@ public class RaffleControllerActivity implements IRaffleActivityService {
     }
 
     @Override
-    public Response<BigDecimal> queryUserCreditAccount(String userId) {
+    @PostMapping("query_user_credit_account")
+    public Response<BigDecimal> queryUserCreditAccount(@RequestParam String userId) {
+        log.info("开始执行查询用户积分账户服务，userId：{}", userId);
         try{
             BigDecimal creditAccount = creditService.queryCreditAvailableByUserId(userId);
+            log.info("结束执行查询用户积分账户服务，返回结果：{}", creditAccount);
             return Response.<BigDecimal>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
@@ -406,6 +375,7 @@ public class RaffleControllerActivity implements IRaffleActivityService {
                     .build();
         }catch (Exception e){
             log.error("查询用户积分账户失败 userId：{}", userId);
+            e.printStackTrace();
             return Response.<BigDecimal>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())

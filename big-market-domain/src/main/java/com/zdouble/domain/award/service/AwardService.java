@@ -63,12 +63,9 @@ public class AwardService implements IAwardService {
 
     @Override
     public void giveOutPrizes(DistributeAwardEntity distributeAwardEntity) {
+        log.info("用户奖品发放，奖品id：{}, 奖品配置：{}", distributeAwardEntity.getAwardId(), distributeAwardEntity.getAwardConfig());
         // 根据id奖品的award_key
         String awardKey = awardRepository.queryAwardKey(distributeAwardEntity.getAwardId());
-        if (null == awardKey) {
-            log.error("未找到奖品id不存在");
-            return;
-        }
         IDistributeAward distributeAward = distributeAwardMap.get(awardKey);
         if (distributeAward == null) {
             throw new RuntimeException("未找到奖品发放配置服务");

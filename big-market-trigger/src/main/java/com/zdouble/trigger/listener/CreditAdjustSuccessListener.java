@@ -28,6 +28,7 @@ public class CreditAdjustSuccessListener {
     @RabbitListener(queuesToDeclare = @Queue(value = "${spring.rabbitmq.topic.credit_adjust_success}"))
     public void onMessage(String message) {
         try {
+            log.info("监听积分账户调整成功消息，进行交易商品发货 topic: {} message: {}", topic, message);
             BaseEvent.EventMessage<CreditAdjustSuccessMessageEvent.CreditAdjustSuccessMessage> eventMessage = JSON.parseObject(message, new TypeReference<BaseEvent.EventMessage<CreditAdjustSuccessMessageEvent.CreditAdjustSuccessMessage>>() {
             }.getType());
             CreditAdjustSuccessMessageEvent.CreditAdjustSuccessMessage eventMessageData = eventMessage.getData();
@@ -38,7 +39,6 @@ public class CreditAdjustSuccessListener {
                     .outBusinessNo(eventMessageData.getOutBusinessNo())
                     .build();
             raffleActivityAccountQuotaService.updateOrder(deliveryOrderEntity);
-            log.info("监听积分账户调整成功消息，进行交易商品发货 topic: {} message: {}", topic, message);
         } catch (AppException e) {
             if (ResponseCode.INDEX_DUP.getCode().equals(e.getCode())) {
                 log.warn("监听积分账户调整成功消息，进行交易商品发货，消费重复 topic: {} message: {}", topic, message, e);

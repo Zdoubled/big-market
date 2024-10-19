@@ -25,12 +25,14 @@ public class ActivityArmory implements IActivityArmory, IActivityDispatch {
 
     @Override
     public Boolean assembleActivitySkuByActivityId(Long activityId) {
+        log.info("活动sku装配开始 activityId：{}", activityId);
         List<ActivitySkuEntity> activitySkuEntities = activityRepository.queryActivitySkuByActivityId(activityId);
         for (ActivitySkuEntity activitySkuEntity : activitySkuEntities) {
             cacheActivitySkuCount(activitySkuEntity.getSku(), activitySkuEntity.getStockCount());
             activityRepository.queryActivityCountByActivityCountId(activitySkuEntity.getActivityCountId());
         }
         activityRepository.queryActivityByActivityId(activityId);
+        log.info("活动sku装配结束 activityId：{}", activityId);
         return true;
     }
 

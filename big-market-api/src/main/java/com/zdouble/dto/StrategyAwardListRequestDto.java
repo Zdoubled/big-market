@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StrategyAwardListRequestDto {
-     private Long activityId;
      private String userId;
+     private Long activityId;
 }

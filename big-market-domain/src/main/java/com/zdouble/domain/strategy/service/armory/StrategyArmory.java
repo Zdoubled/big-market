@@ -34,6 +34,7 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
 
     @Override
     public Boolean assembleLotteryStrategy(Long strategyId) {
+        log.info("策略装配开始 articleId：{}", strategyId);
         //1.获取完整策略配置
         List<StrategyAwardEntity> strategyAwardList = strategyRepository.queryStrategyAwardList(strategyId);
         //2.缓存奖品库存
@@ -61,6 +62,7 @@ public class StrategyArmory implements IStrategyArmory, IStrategyDispatch {
             strategyAwardListClone.removeIf(strategyAwardEntity -> !value.contains(strategyAwardEntity.getAwardId()));
             assembleLotteryStrategy(String.valueOf(strategyId).concat("_").concat(key), strategyAwardListClone);
         });
+        log.info("策略装配结束 articleId：{}", strategyId);
         return true;
     }
 

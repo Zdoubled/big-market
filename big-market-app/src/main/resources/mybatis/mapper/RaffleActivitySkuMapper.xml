@@ -24,7 +24,7 @@
         set stock_count_surplus = stock_count_surplus - 1 , update_time = now()
         where sku = #{sku} and activity_id = #{activityId}
     </update>
-    <update id="updateSkuStockZero">
+    <update id="updateSkuStockZero" parameterType="java.lang.Long">
         update raffle_activity_sku
         set stock_count_surplus = 0 , update_time = now()
         where sku = #{sku}

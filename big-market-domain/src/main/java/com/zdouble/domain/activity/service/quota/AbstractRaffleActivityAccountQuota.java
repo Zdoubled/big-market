@@ -32,7 +32,11 @@ public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivityS
         }
         // 查询数据库是否有为支付的订单（一个月以内）
         UnpaidActivityOrderEntity unpaidActivityOrderEntity = activityRepository.queryUnpaidActivityOrder(activitySkuChargeEntity);
-        if (null != unpaidActivityOrderEntity) return unpaidActivityOrderEntity;
+        if (null != unpaidActivityOrderEntity) {
+            log.info("存在未消费订单,返回订单信息:{}", unpaidActivityOrderEntity);
+            return unpaidActivityOrderEntity;
+        }
+        log.info("不存在未消费订单,创建订单:{}", activitySkuChargeEntity);
         // 2. 查询数据库
         ActivitySkuEntity activitySkuEntity = queryActivitySku(sku);
         ActivityEntity activityEntity = queryActivityByActivityId(activitySkuEntity.getActivityId());

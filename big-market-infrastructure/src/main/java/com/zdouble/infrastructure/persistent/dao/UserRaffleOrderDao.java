@@ -9,9 +9,9 @@ import org.apache.ibatis.annotations.Mapper;
 @DBRouterStrategy(splitTable = true)
 public interface UserRaffleOrderDao {
     @DBRouter(key = "userId")
-    UserRaffleOrder queryUserRaffleOrder(Long activityId, String userId);
+    UserRaffleOrder queryUserRaffleOrder(UserRaffleOrder userRaffleOrder);
 
-    void insert(UserRaffleOrder build);
+    void insert(UserRaffleOrder userRaffleOrder);
 
     int updateUserRaffleOrderStateUsed(UserRaffleOrder userRaffleOrder);
 }

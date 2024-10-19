@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zdouble.infrastructure.persistent.dao.UserCreditAccountDao">
+
+    <resultMap id="resultMap" type="com.zdouble.infrastructure.persistent.po.UserCreditAccount">
+            <id property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="totalAmount" column="total_amount"/>
+            <result property="availableAmount" column="available_amount"/>
+            <result property="accountStatus" column="account_status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.zdouble.infrastructure.persistent.po.UserCreditAccount">
+        insert into user_credit_account (user_id, total_amount, available_amount, account_status, create_time, update_time)
+        values (#{userId}, #{totalAmount}, #{availableAmount}, #{accountStatus}, now(), now())
+    </insert>
+    <update id="updateUserCreditAccount" parameterType="com.zdouble.infrastructure.persistent.po.UserCreditAccount">
+        update user_credit_account
+        set total_amount = total_amount + #{totalAmount}, available_amount = available_amount + #{availableAmount}
+        where user_id = #{userId} and account_status = #{accountStatus}
+    </update>
+    <select id="queryUserCreditAccount" parameterType="com.zdouble.infrastructure.persistent.po.UserCreditAccount"
+            resultMap="resultMap">
+        select * from user_credit_account
+        where user_id = #{userId} and account_status = #{accountStatus}
+    </select>
+</mapper>

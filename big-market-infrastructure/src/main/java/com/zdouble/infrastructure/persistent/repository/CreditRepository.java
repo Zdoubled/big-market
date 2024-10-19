@@ -6,6 +6,7 @@ import com.zdouble.domain.credit.aggregate.TradeAggregate;
 import com.zdouble.domain.credit.model.entity.TaskEntity;
 import com.zdouble.domain.credit.model.entity.UserCreditAccountEntity;
 import com.zdouble.domain.credit.model.entity.UserCreditOrderEntity;
+import com.zdouble.domain.credit.model.vo.UserCreditAccountStatusVO;
 import com.zdouble.domain.credit.repository.ICreditRepository;
 import com.zdouble.infrastructure.event.EventPublisher;
 import com.zdouble.infrastructure.persistent.dao.TaskDao;
@@ -115,6 +116,16 @@ public class CreditRepository implements ICreditRepository {
 
     @Override
     public BigDecimal queryCreditAvailableByUserId(String userId) {
-        return userCreditAccountDao.queryCreditAvailableByUserId(userId);
+        try {
+            routerStrategy.doRouter(userId);
+            UserCreditAccount creditAccount = UserCreditAccount.builder()
+                    .userId(userId)
+                    .accountStatus(UserCreditAccountStatusVO.open.getCode())
+                    .build();
+            creditAccount = userCreditAccountDao.queryUserCreditAccount(creditAccount);
+            return creditAccount.getAvailableAmount();
+        }finally {
+            routerStrategy.clear();
+        }
     }
 }

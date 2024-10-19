@@ -16,7 +16,7 @@
     <select id="queryRuleLockCount" resultMap="resultMap">
         select tree_id, rule_value from rule_tree_node
         where rule_key = 'rule_lock' and tree_id in
-        <foreach collection="treeIds" item="treeId" open="(" close=")" separator=",">
+        <foreach item="treeId" index="index" collection="treeIds" open="(" separator="," close=")">
             #{treeId}
         </foreach>
     </select>

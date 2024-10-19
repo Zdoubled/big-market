@@ -341,7 +341,12 @@ public class ActivityRepository implements IActivityRepository {
 
     @Override
     public UserRaffleOrderEntity queryUserRaffleOrder(Long activityId, String userId) {
-        UserRaffleOrder userRaffleOrder = userRaffleOrderDao.queryUserRaffleOrder(activityId, userId);
+        UserRaffleOrder userRaffleOrder = UserRaffleOrder.builder()
+                .activityId(activityId)
+                .userId(userId)
+                .orderState(UserRaffleOrderStateVO.create.getCode())
+                .build();
+        userRaffleOrder = userRaffleOrderDao.queryUserRaffleOrder(userRaffleOrder);
         if (null == userRaffleOrder) return null;
         return UserRaffleOrderEntity.builder()
                 .userId(userRaffleOrder.getUserId())

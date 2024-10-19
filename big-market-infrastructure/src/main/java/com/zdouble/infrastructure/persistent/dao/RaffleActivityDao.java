@@ -2,15 +2,16 @@ package com.zdouble.infrastructure.persistent.dao;
 
 import com.zdouble.infrastructure.persistent.po.RaffleActivity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface RaffleActivityDao {
 
     void insert(RaffleActivity raffleActivity);
 
-    RaffleActivity queryRaffleActivityByActivityId(Long activityId);
+    RaffleActivity queryRaffleActivityByActivityId(@Param("activityId") Long activityId);
 
-    Long queryStrategyIdByActivityId(Long articleId);
+    Long queryStrategyIdByActivityId(@Param("articleId") Long articleId);
 
-    Long queryActivityIdByStrategyId(Long strategyId);
+    Long queryActivityIdByStrategyId(@Param("strategyId") Long strategyId);
 }

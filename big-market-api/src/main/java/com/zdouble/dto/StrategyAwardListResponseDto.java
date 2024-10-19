@@ -20,7 +20,7 @@ public class StrategyAwardListResponseDto {
     // 奖品排序位置
     private Integer sort;
     // 奖品是否解锁字段 true 解锁; false 未解锁
-    private Boolean isAwardUnLock;
+    private Boolean isAwardUnlock;
     // 奖品解锁所需抽奖次数 -- 抽奖N次后解锁，未配置则为空
     private Integer awardRuleLockCount;
     // 奖品解锁剩余抽奖次数 -- 规定的抽奖N次解锁减去用户已经抽奖次数

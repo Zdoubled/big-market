@@ -2,6 +2,7 @@ package com.zdouble.infrastructure.persistent.dao;
 
 import com.zdouble.infrastructure.persistent.po.RaffleActivitySku;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,13 +12,13 @@ public interface RaffleActivitySkuDao {
 
     RaffleActivitySku conditionQueryRaffleActivitySku(RaffleActivitySku raffleActivitySku);
 
-    RaffleActivitySku queryActivitySku(Long sku);
+    RaffleActivitySku queryActivitySku(@Param("sku") Long sku);
 
-    void updateSkuStock(Long sku, Long activityId);
+    void updateSkuStock(@Param("sku") Long sku,@Param("activityId") Long activityId);
 
-    void updateSkuStockZero(Long sku);
+    void updateSkuStockZero(@Param("sku") Long sku);
 
-    List<RaffleActivitySku> queryActivitySkuByActivityId(Long activityId);
+    List<RaffleActivitySku> queryActivitySkuByActivityId(@Param("activityId") Long activityId);
 
     List<RaffleActivitySku> queryActivitySkuList();
 }

@@ -18,11 +18,7 @@ public interface UserCreditAccountDao {
 
     int updateUserCreditAccount(UserCreditAccount userCreditAccount);
     void insert(UserCreditAccount creditAccount);
-
     UserCreditAccount queryUserCreditAccount(UserCreditAccount userCreditAccount);
-
-    @DBRouter
-    BigDecimal queryCreditAvailableByUserId(String userId);
 }
 
 

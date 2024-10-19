@@ -1,7 +1,5 @@
 package com.zdouble.infrastructure.persistent.repository;
 
-import com.alibaba.fastjson.TypeReference;
-import com.zdouble.domain.award.model.vo.TaskStateVO;
 import com.zdouble.domain.task.model.TaskEntity;
 import com.zdouble.domain.task.repository.ITaskRepository;
 import com.zdouble.infrastructure.event.EventPublisher;

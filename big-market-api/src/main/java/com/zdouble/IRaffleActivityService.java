@@ -44,13 +44,6 @@ public interface IRaffleActivityService {
     Response<ActivityAccountQuotaResponseDto> userAccountQuota(ActivityAccountQuotaRequestDto activityAccountQuotaRequestDto);
 
     /**
-     * 权重配置
-     * @param dto
-     * @return
-     */
-    Response<List<RaffleStrategyRuleWeightResponseDto>> queryRaffleStrategyRuleWeight(RaffleStrategyRuleWeightRequestDto dto);
-
-    /**
      * 积分兑换接口
      * @param dto
      * @return

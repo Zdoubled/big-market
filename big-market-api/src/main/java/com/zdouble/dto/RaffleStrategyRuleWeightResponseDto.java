@@ -17,7 +17,7 @@ public class RaffleStrategyRuleWeightResponseDto {
     // 当前用户在这个活动总抽奖次数
     private Integer userActivityAccountTotalUseCount;
     // 当前权重可抽奖范围
-    private List<AwardVO> awardVOS;
+    private List<AwardVO> strategyAwards;
 
     @Data
     @Builder

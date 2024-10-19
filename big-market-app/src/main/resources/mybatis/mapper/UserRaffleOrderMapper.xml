@@ -21,7 +21,7 @@
         update user_raffle_order set order_state = 'used'
         where order_id = #{orderId} and user_id = #{userId} and order_state = 'create';
     </update>
-    <select id="queryUserRaffleOrder" resultMap="resultMap">
+    <select id="queryUserRaffleOrder" parameterType="com.zdouble.infrastructure.persistent.po.UserRaffleOrder" resultMap="resultMap">
         select user_id, activity_id, activity_name, strategy_id, order_id, order_time, order_state
         from user_raffle_order where activity_id = #{activityId} and user_id = #{userId} and order_state = 'create';
     </select>

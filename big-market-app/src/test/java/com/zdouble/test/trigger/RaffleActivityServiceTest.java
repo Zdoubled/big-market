@@ -40,14 +40,4 @@ public class RaffleActivityServiceTest {
         log.info("请求参数：{}", JSON.toJSONString(request));
         log.info("测试结果：{}", JSON.toJSONString(response));
     }
-
-    @Test
-    public void test_queryRaffleStrategyRuleWeight() {
-        RaffleStrategyRuleWeightRequestDto request = new RaffleStrategyRuleWeightRequestDto();
-        request.setUserId("xiaofuge");
-        request.setActivityId(100301L);
-        Response<List<RaffleStrategyRuleWeightResponseDto>> response = raffleActivityService.queryRaffleStrategyRuleWeight(request);
-        log.info("请求参数：{}", JSON.toJSONString(request));
-        log.info("测试结果：{}", JSON.toJSONString(response));
-    }
 }

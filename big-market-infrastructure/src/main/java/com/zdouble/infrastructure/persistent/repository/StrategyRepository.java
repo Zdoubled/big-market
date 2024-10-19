@@ -54,12 +54,15 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId) {
         //1.查询redis缓存
+        log.info("查询策略奖品：{}", strategyId);
         String cacheKey = Constants.RedisKey.STRATEGY_AWARD_LIST_KEY + strategyId;
         List<StrategyAwardEntity> strategyAwardEntryList = redisService.getValue(cacheKey);
         if (null != strategyAwardEntryList && !strategyAwardEntryList.isEmpty()) {
+            log.info("查询redis缓存成功，strategyId：{}, cacheKey：{}", strategyId, cacheKey);
             return strategyAwardEntryList;
         }
         //2.从库中查询策略配置,并缓存到redis中
+        log.info("第一次查询,开始查询数据库,并缓存到redis中");
         List<StrategyAward> strategyAwardList = strategyAwardDao.queryStrategyAwardListByStrategyId(strategyId);
         strategyAwardEntryList = strategyAwardList.stream().map(strategyAward -> {
             return StrategyAwardEntity.builder()
@@ -75,6 +78,7 @@ public class StrategyRepository implements IStrategyRepository {
                     .build();
         }).collect(Collectors.toList());
         redisService.setValue(cacheKey, strategyAwardEntryList);
+        log.info("查询策略奖品结束，strategyId：{}, cacheKey：{}", strategyId, cacheKey);
         return strategyAwardEntryList;
     }
 
@@ -321,13 +325,24 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Override
     public HashMap<String, Integer> queryRuleLockCount(String[] treeIds) {
-        List<RuleTreeNode> ruleTreeNodes = ruleTreeNodeDao.queryRuleLockCount(treeIds);
+        for (String treeId : treeIds) {
+            log.info("treeId: " + treeId);
+        }
+        List<RuleTreeNode> ruleTreeNodes = null;
+        try {
+            ruleTreeNodes = ruleTreeNodeDao.queryRuleLockCount(treeIds);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.info("根据treeIds查询规则树节点失败");
+            return null;
+        }
         HashMap<String, Integer> resultMap = new HashMap<>();
         for (RuleTreeNode ruleTreeNode : ruleTreeNodes) {
             String treeId = ruleTreeNode.getTreeId();
             Integer ruleCount = Integer.valueOf(ruleTreeNode.getRuleValue());
             resultMap.put(treeId, ruleCount);
         }
+        log.info("resultMap: " + resultMap);
         return resultMap;
     }
 

@@ -4,6 +4,7 @@ import cn.bugstack.middleware.db.router.annotation.DBRouter;
 import cn.bugstack.middleware.db.router.annotation.DBRouterStrategy;
 import com.zdouble.infrastructure.persistent.po.RaffleActivityOrder;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface RaffleActivityOrderDao {
     void insert(RaffleActivityOrder raffleActivityOrder);
 
     @DBRouter
-    List<RaffleActivityOrder> queryRaffleActivityOrderByUserId(String userId);
+    List<RaffleActivityOrder> queryRaffleActivityOrderByUserId(@Param("userId") String userId);
 
     int updateOrderCompleted(RaffleActivityOrder raffleActivityOrder);
 

@@ -101,6 +101,7 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
         }
         // 等待任务和订单落库后发送mq消息
         for (UserBehaviorRebateAggregate userBehaviorRebateAggregate : userBehaviorRebateAggregates) {
+            log.info("用户返利行为奖品发放mq信息, {}", userBehaviorRebateAggregate.toString());
             TaskEntity taskEntity = userBehaviorRebateAggregate.getTaskEntity();
             Task task = Task.builder().userId(taskEntity.getUserId()).messageId(taskEntity.getMessageId()).build();
             try {
